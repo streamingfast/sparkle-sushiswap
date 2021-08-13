@@ -380,16 +380,16 @@ type LiquidityPosition @entity {
 # saved over time for return calculations, gets created and never updated
 type LiquidityPositionSnapshot @entity {
   id: ID!
-  liquidityPosition: LiquidityPosition!
-  timestamp: Int! # saved for fast historical lookups
-  block: Int! # saved for fast historical lookups
-  user: User! # reference to user
-  pair: Pair! # reference to pair
-  token0PriceUSD: BigDecimal! # snapshot of token0 price
-  token1PriceUSD: BigDecimal! # snapshot of token1 price
-  reserve0: BigDecimal! # snapshot of pair token0 reserves
-  reserve1: BigDecimal! # snapshot of pair token1 reserves
-  reserveUSD: BigDecimal! # snapshot of pair reserves in USD
+  liquidityPosition: LiquidityPosition! @parallel(step: 3)
+  timestamp: Int! @parallel(step: 3) # saved for fast historical lookups
+  block: Int! @parallel(step: 3) # saved for fast historical lookups
+  user: User! @parallel(step: 3) # reference to user
+  pair: Pair! @parallel(step: 3) # reference to pair
+  token0PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token0 price
+  token1PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token1 price
+  reserve0: BigDecimal! @parallel(step: 3) # snapshot of pair token0 reserves
+  reserve1: BigDecimal! @parallel(step: 3) # snapshot of pair token1 reserves
+  reserveUSD: BigDecimal! @parallel(step: 3) # snapshot of pair reserves in USD
   liquidityTokenTotalSupply: BigDecimal! @parallel(step: 3, type: SUM) # snapshot of pool token supply
   # snapshot of users pool token balance
   liquidityTokenBalance: BigDecimal! @parallel(step: 3)
