@@ -2,70 +2,61 @@
 
 package exchange
 
-//func (u *User) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
+)
 
-//func (b *Bundle) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (t *Token) Sanitize() {
+	t.Name = strings.ReplaceAll(t.Name, "\u0000", "")
+	t.Symbol = strings.ReplaceAll(t.Symbol, "\u0000", "")
+}
 
-//func (f *Factory) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (p *Pair) Sanitize() {
+	p.Name = strings.ReplaceAll(p.Name, "\u0000", "")
+}
 
-//func (h *HourData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (h *HourData) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	hourId := blockTime.Unix() / 3600
+	activeId := strconv.FormatInt(hourId, 10)
 
-//func (d *DayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+	return h.ID != activeId
+}
 
-//func (t *Token) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (d *DayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	dayId := blockTime.Unix() / 86400
+	activeId := strconv.FormatInt(dayId, 10)
 
-//func (t *TokenHourData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+	return d.ID != activeId
+}
 
-//func (t *TokenDayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (t *TokenDayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	dayId := blockTime.Unix() / 86400
+	activeId := fmt.Sprintf("%s-%d", t.Token, dayId)
 
-//func (p *Pair) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+	return t.ID != activeId
+}
 
-//func (p *PairHourData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (p *PairHourData) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	hourId := blockTime.Unix() / 3600
+	activeId := fmt.Sprintf("%s-%d", p.Pair, hourId)
 
-//func (p *PairDayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+	return p.ID != activeId
+}
 
-//func (l *LiquidityPosition) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (p *PairDayData) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	dayId := blockTime.Unix() / 86400
+	activeId := fmt.Sprintf("%s-%d", p.Pair, dayId)
 
-//func (l *LiquidityPositionSnapshot) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+	return p.ID != activeId
+}
 
-//func (t *Transaction) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (t *Transaction) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	return true
+}
 
-//func (m *Mint) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
-
-//func (b *Burn) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
-
-//func (s *Swap) IsFinal(blockNum uint64, blockTime time.Time) bool {
-//	//uncomment and implement if necessary
-//}
+func (s *Swap) IsFinal(blockNum uint64, blockTime time.Time) bool {
+	return true
+}

@@ -40,7 +40,7 @@ var (
 
 var Definition = &subgraph.Definition{
 	PackageName:         "exchange",
-	HighestParallelStep: 0,
+	HighestParallelStep: 3,
 	StartBlock:          10794229,
 	IncludeFilter:       "",
 	Entities: entity.NewRegistry(
@@ -171,7 +171,9 @@ type User @entity {
 # Bundle
 type Bundle @entity {
   id: ID!
-  ethPrice: BigDecimal! # price of ETH usd
+
+  # price of ETH usd
+  ethPrice: BigDecimal! @parallel(step: 3)
 }
 
 # Factory
@@ -180,31 +182,31 @@ type Factory @entity {
   id: ID!
 
   # Pair count
-  pairCount: BigInt!
+  pairCount: BigInt! @parallel(step: 1, type: SUM)
 
   # Volume USD
-  volumeUSD: BigDecimal!
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
 
   # Volume ETH
-  volumeETH: BigDecimal!
+  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
 
   # Untracked volume
-  untrackedVolumeUSD: BigDecimal!
+  untrackedVolumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
 
   # Liquidity USD
-  liquidityUSD: BigDecimal!
+  liquidityUSD: BigDecimal! @parallel(step: 3)
 
   # Liquidity ETH
-  liquidityETH: BigDecimal!
+  liquidityETH: BigDecimal! @parallel(step: 3)
 
   # Transaction count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 
   # Token count
-  tokenCount: BigInt!
+  tokenCount: BigInt! @parallel(step: 3, type: SUM)
 
   # User count
-  userCount: BigInt!
+  userCount: BigInt! @parallel(step: 3, type: SUM)
 
   # Pairs
   pairs: [Pair!]! @derivedFrom(field: "factory")
@@ -225,22 +227,22 @@ type HourData @entity {
   id: ID!
 
   # date
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal!
-  volumeUSD: BigDecimal!
-  untrackedVolume: BigDecimal!
+  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal!
-  liquidityUSD: BigDecimal!
+  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 3)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 }
 
 # Day Data
@@ -249,22 +251,22 @@ type DayData @entity {
   id: ID!
 
   # date
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal!
-  volumeUSD: BigDecimal!
-  untrackedVolume: BigDecimal!
+  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal!
-  liquidityUSD: BigDecimal!
+  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 3)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 }
 
 # Token
@@ -276,27 +278,27 @@ type Token @entity {
   factory: Factory!
 
   # mirrored from the smart contract
-  symbol: String!
-  name: String!
-  decimals: BigInt!
+  symbol: String! @parallel(step: 1)
+  name: String! @parallel(step: 1)
+  decimals: BigInt! @parallel(step: 1)
 
   # used for other stats like marketcap
-  totalSupply: BigInt!
+  totalSupply: BigInt!  @parallel(step: 3, type: SUM)
 
   # token specific volume
-  volume: BigDecimal!
-  volumeUSD: BigDecimal!
-  untrackedVolumeUSD: BigDecimal!
+  volume: BigDecimal!  @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
 
   # transactions across all pairs
-  txCount: BigInt!
+  txCount: BigInt!  @parallel(step: 3, type: SUM)
 
   # liquidity across all pairs
-  liquidity: BigDecimal!
+  liquidity: BigDecimal!  @parallel(step: 3, type: SUM)
 
-  derivedETH: BigDecimal!
+  derivedETH: BigDecimal! @parallel(step: 2)
 
-  whitelistPairs: [Pair!]!
+  whitelistPairs: [Pair!]! @parallel(step: 1)
 
   # Token hour data
   hourData: [TokenHourData!]! @derivedFrom(field: "token")
@@ -323,26 +325,26 @@ type TokenHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # token
-  token: Token!
+  token: Token! @parallel(step: 3)
 
   # volume
-  volume: BigDecimal!
-  volumeETH: BigDecimal!
-  volumeUSD: BigDecimal!
+  volume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal!
-  liquidityETH: BigDecimal!
-  liquidityUSD: BigDecimal!
+  liquidity: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 3)
 
   # price usd
-  priceUSD: BigDecimal!
+  priceUSD: BigDecimal! @parallel(step: 3)
 }
 
 # Token day data
@@ -351,26 +353,26 @@ type TokenDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # token
-  token: Token!
+  token: Token! @parallel(step: 3)
 
   # volume
-  volume: BigDecimal!
-  volumeETH: BigDecimal!
-  volumeUSD: BigDecimal!
+  volume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal!
-  liquidityETH: BigDecimal!
-  liquidityUSD: BigDecimal!
+  liquidity: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 3)
 
   # price usd
-  priceUSD: BigDecimal!
+  priceUSD: BigDecimal! @parallel(step: 3)
 }
 
 # Pair
@@ -382,37 +384,37 @@ type Pair @entity {
   factory: Factory!
 
   # Name
-  name: String!
+  name: String! @parallel(step: 1)
 
   # mirrored from the smart contract
-  token0: Token!
-  token1: Token!
+  token0: Token! @parallel(step: 1)
+  token1: Token! @parallel(step: 1)
 
-  reserve0: BigDecimal!
-  reserve1: BigDecimal!
-  totalSupply: BigDecimal!
+  reserve0: BigDecimal! @parallel(step: 2)
+  reserve1: BigDecimal! @parallel(step: 2)
+  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
 
   # derived liquidity
-  reserveETH: BigDecimal!
-  reserveUSD: BigDecimal!
+  reserveETH: BigDecimal! @parallel(step: 3)
+  reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal!
+  trackedReserveETH: BigDecimal! @sql(index: false)
 
   # Price in terms of the asset pair
-  token0Price: BigDecimal!
-  token1Price: BigDecimal!
+  token0Price: BigDecimal! @parallel(step: 2)
+  token1Price: BigDecimal! @parallel(step: 2)
 
   # lifetime volume stats
-  volumeToken0: BigDecimal!
-  volumeToken1: BigDecimal!
-  volumeUSD: BigDecimal!
-  untrackedVolumeUSD: BigDecimal!
-  txCount: BigInt!
+  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
+  txCount: BigInt!  @parallel(step: 3, type: SUM)
 
   # Fields used to help derived relationship
   # used to detect new exchanges
-  liquidityProviderCount: BigInt!
+  liquidityProviderCount: BigInt! @parallel(step: 3, type: SUM)
 
   # lca: BigDecimal!
   # lcad: BigDecimal!
@@ -435,8 +437,8 @@ type Pair @entity {
   swaps: [Swap!]! @derivedFrom(field: "pair")
 
   # Created at
-  timestamp: BigInt!
-  block: BigInt!
+  timestamp: BigInt! @parallel(step: 1)
+  block: BigInt! @parallel(step: 1)
 }
 
 # Pair hour data
@@ -445,27 +447,27 @@ type PairHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # pair
-  pair: Pair!
+  pair: Pair! @parallel(step: 3)
 
   # reserves
-  reserve0: BigDecimal!
-  reserve1: BigDecimal!
+  reserve0: BigDecimal! @parallel(step: 3)
+  reserve1: BigDecimal! @parallel(step: 3)
 
   # derived liquidity
   reserveUSD: BigDecimal!
 
   # volume
-  volumeToken0: BigDecimal!
-  volumeToken1: BigDecimal!
+  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal!
+  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 }
 
 # Pair day data
@@ -474,47 +476,47 @@ type PairDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int!
+  date: Int! @parallel(step: 3)
 
   # pair
-  pair: Pair!
+  pair: Pair! @parallel(step: 3)
 
   # token0
-  token0: Token!
+  token0: Token! @parallel(step: 3)
 
   # token1
-  token1: Token!
+  token1: Token! @parallel(step: 3)
 
   # reserves
-  reserve0: BigDecimal!
-  reserve1: BigDecimal!
+  reserve0: BigDecimal! @parallel(step: 3)
+  reserve1: BigDecimal! @parallel(step: 3)
 
   # total supply for LP historical returns
-  totalSupply: BigDecimal!
+  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
 
   # derived liquidity
-  reserveUSD: BigDecimal!
+  reserveUSD: BigDecimal! @parallel(step: 3)
 
   # volume
-  volumeToken0: BigDecimal!
-  volumeToken1: BigDecimal!
+  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal!
+  volumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
 
   # tx count
-  txCount: BigInt!
+  txCount: BigInt! @parallel(step: 3, type: SUM)
 }
 
 # liquidity position
 type LiquidityPosition @entity {
   id: ID!
-  user: User!
-  pair: Pair!
-  liquidityTokenBalance: BigDecimal!
+  user: User! @parallel(step: 3)
+  pair: Pair! @parallel(step: 3)
+  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
   snapshots: [LiquidityPositionSnapshot]! @derivedFrom(field: "liquidityPosition")
-  block: Int!
-  timestamp: Int!
+  block: Int! @parallel(step: 3)
+  timestamp: Int! @parallel(step: 3)
 }
 
 # saved over time for return calculations, gets created and never updated
@@ -530,17 +532,17 @@ type LiquidityPositionSnapshot @entity {
   reserve0: BigDecimal! # snapshot of pair token0 reserves
   reserve1: BigDecimal! # snapshot of pair token1 reserves
   reserveUSD: BigDecimal! # snapshot of pair reserves in USD
-  liquidityTokenTotalSupply: BigDecimal! # snapshot of pool token supply
+  liquidityTokenTotalSupply: BigDecimal! @parallel(step: 3, type: SUM) # snapshot of pool token supply
   # snapshot of users pool token balance
-  liquidityTokenBalance: BigDecimal!
+  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
 }
 
 # transaction
 type Transaction @entity {
   # transaction hash
   id: ID!
-  blockNumber: BigInt!
-  timestamp: BigInt!
+  blockNumber: BigInt! @parallel(step: 3)
+  timestamp: BigInt! @parallel(step: 3)
   # This is not the reverse of Mint.transaction; it is only used to
   # track incomplete mints (similar for burns and swaps)
   mints: [Mint]!
@@ -552,74 +554,74 @@ type Transaction @entity {
 type Mint @entity {
   # transaction hash - index of mint in transaction mints array
   id: ID!
-  transaction: Transaction!
-  timestamp: BigInt! # need this to pull recent txns for specific token or pair
-  pair: Pair!
+  transaction: Transaction! @parallel(step: 3)
+  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 3)
 
   # populated from the primary Transfer event
-  to: Bytes!
-  liquidity: BigDecimal!
+  to: String! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 3)
 
   # populated from the Mint event
-  sender: Bytes
-  amount0: BigDecimal
-  amount1: BigDecimal
-  logIndex: BigInt
+  sender: String @parallel(step: 3)
+  amount0: BigDecimal @parallel(step: 3)
+  amount1: BigDecimal @parallel(step: 3)
+  logIndex: BigInt @parallel(step: 3)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal @parallel(step: 3)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: Bytes
-  feeLiquidity: BigDecimal
+  feeTo: String @parallel(step: 3)
+  feeLiquidity: BigDecimal @parallel(step: 3)
 }
 
 # burn
 type Burn @entity {
   # transaction hash - index of burn in transaction burns array
   id: ID!
-  transaction: Transaction!
-  timestamp: BigInt! # need this to pull recent txns for specific token or pair
-  pair: Pair!
+  transaction: Transaction! @parallel(step: 3)
+  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 3)
 
   # populated from the primary Transfer event
-  liquidity: BigDecimal!
+  liquidity: BigDecimal! @parallel(step: 3)
 
   # populated from the Burn event
-  sender: Bytes
-  amount0: BigDecimal
-  amount1: BigDecimal
-  to: Bytes
-  logIndex: BigInt
+  sender: String @parallel(step: 3)
+  amount0: BigDecimal @parallel(step: 3)
+  amount1: BigDecimal @parallel(step: 3)
+  to: String @parallel(step: 3)
+  logIndex: BigInt @parallel(step: 3)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal @parallel(step: 3)
 
   # mark uncomplete in ETH case
-  complete: Boolean!
+  complete: Boolean! @parallel(step: 3)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: Bytes
-  feeLiquidity: BigDecimal
+  feeTo: String @parallel(step: 3)
+  feeLiquidity: BigDecimal @parallel(step: 3)
 }
 
 # swap
 type Swap @entity {
   # transaction hash - index of swap in transaction swaps array
   id: ID!
-  transaction: Transaction!
-  timestamp: BigInt! # need this to pull recent txns for specific token or pair
-  pair: Pair!
+  transaction: Transaction! @parallel(step: 3)
+  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 3)
 
   # populated from the Swap event
-  sender: Bytes!
-  amount0In: BigDecimal!
-  amount1In: BigDecimal!
-  amount0Out: BigDecimal!
-  amount1Out: BigDecimal!
-  to: Bytes!
-  logIndex: BigInt
+  sender: String! @parallel(step: 3)
+  amount0In: BigDecimal! @parallel(step: 3)
+  amount1In: BigDecimal! @parallel(step: 3)
+  amount0Out: BigDecimal! @parallel(step: 3)
+  amount1Out: BigDecimal! @parallel(step: 3)
+  to: String! @parallel(step: 3)
+  logIndex: BigInt @parallel(step: 3)
 
   # derived info
-  amountUSD: BigDecimal!
+  amountUSD: BigDecimal! @parallel(step: 3)
 }
 `,
 	Abis: map[string]string{
@@ -2646,6 +2648,8 @@ func NewUser(id string) *User {
 func (_ *User) SkipDBLookup() bool {
 	return false
 }
+func (next *User) Merge(step int, cached *User) {
+}
 
 // Bundle
 type Bundle struct {
@@ -2662,6 +2666,13 @@ func NewBundle(id string) *Bundle {
 
 func (_ *Bundle) SkipDBLookup() bool {
 	return false
+}
+func (next *Bundle) Merge(step int, cached *Bundle) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.EthPrice = cached.EthPrice
+		}
+	}
 }
 
 // Factory
@@ -2696,6 +2707,25 @@ func NewFactory(id string) *Factory {
 func (_ *Factory) SkipDBLookup() bool {
 	return false
 }
+func (next *Factory) Merge(step int, cached *Factory) {
+	if step == 2 {
+		next.PairCount = entity.IntAdd(next.PairCount, cached.PairCount)
+		if next.MutatedOnStep != 1 {
+		}
+	}
+	if step == 4 {
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
+		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		next.TokenCount = entity.IntAdd(next.TokenCount, cached.TokenCount)
+		next.UserCount = entity.IntAdd(next.UserCount, cached.UserCount)
+		if next.MutatedOnStep != 3 {
+			next.LiquidityUSD = cached.LiquidityUSD
+			next.LiquidityETH = cached.LiquidityETH
+		}
+	}
+}
 
 // HourData
 type HourData struct {
@@ -2725,6 +2755,19 @@ func NewHourData(id string) *HourData {
 func (_ *HourData) SkipDBLookup() bool {
 	return false
 }
+func (next *HourData) Merge(step int, cached *HourData) {
+	if step == 4 {
+		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.UntrackedVolume = entity.FloatAdd(next.UntrackedVolume, cached.UntrackedVolume)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.LiquidityETH = cached.LiquidityETH
+			next.LiquidityUSD = cached.LiquidityUSD
+		}
+	}
+}
 
 // DayData
 type DayData struct {
@@ -2753,6 +2796,19 @@ func NewDayData(id string) *DayData {
 
 func (_ *DayData) SkipDBLookup() bool {
 	return false
+}
+func (next *DayData) Merge(step int, cached *DayData) {
+	if step == 4 {
+		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.UntrackedVolume = entity.FloatAdd(next.UntrackedVolume, cached.UntrackedVolume)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.LiquidityETH = cached.LiquidityETH
+			next.LiquidityUSD = cached.LiquidityUSD
+		}
+	}
 }
 
 // Token
@@ -2789,6 +2845,31 @@ func NewToken(id string) *Token {
 func (_ *Token) SkipDBLookup() bool {
 	return false
 }
+func (next *Token) Merge(step int, cached *Token) {
+	if step == 2 {
+		if next.MutatedOnStep != 1 {
+			next.Symbol = cached.Symbol
+			next.Name = cached.Name
+			next.Decimals = cached.Decimals
+			next.WhitelistPairs = cached.WhitelistPairs
+		}
+	}
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
+			next.DerivedETH = cached.DerivedETH
+		}
+	}
+	if step == 4 {
+		next.TotalSupply = entity.IntAdd(next.TotalSupply, cached.TotalSupply)
+		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		next.Liquidity = entity.FloatAdd(next.Liquidity, cached.Liquidity)
+		if next.MutatedOnStep != 3 {
+		}
+	}
+}
 
 // TokenHourData
 type TokenHourData struct {
@@ -2822,6 +2903,22 @@ func NewTokenHourData(id string) *TokenHourData {
 func (_ *TokenHourData) SkipDBLookup() bool {
 	return false
 }
+func (next *TokenHourData) Merge(step int, cached *TokenHourData) {
+	if step == 4 {
+		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
+		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.Token = cached.Token
+			next.Liquidity = cached.Liquidity
+			next.LiquidityETH = cached.LiquidityETH
+			next.LiquidityUSD = cached.LiquidityUSD
+			next.PriceUSD = cached.PriceUSD
+		}
+	}
+}
 
 // TokenDayData
 type TokenDayData struct {
@@ -2854,6 +2951,22 @@ func NewTokenDayData(id string) *TokenDayData {
 
 func (_ *TokenDayData) SkipDBLookup() bool {
 	return false
+}
+func (next *TokenDayData) Merge(step int, cached *TokenDayData) {
+	if step == 4 {
+		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
+		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.Token = cached.Token
+			next.Liquidity = cached.Liquidity
+			next.LiquidityETH = cached.LiquidityETH
+			next.LiquidityUSD = cached.LiquidityUSD
+			next.PriceUSD = cached.PriceUSD
+		}
+	}
 }
 
 // Pair
@@ -2906,6 +3019,38 @@ func NewPair(id string) *Pair {
 func (_ *Pair) SkipDBLookup() bool {
 	return false
 }
+func (next *Pair) Merge(step int, cached *Pair) {
+	if step == 2 {
+		if next.MutatedOnStep != 1 {
+			next.Name = cached.Name
+			next.Token0 = cached.Token0
+			next.Token1 = cached.Token1
+			next.Timestamp = cached.Timestamp
+			next.Block = cached.Block
+		}
+	}
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
+			next.Token0Price = cached.Token0Price
+			next.Token1Price = cached.Token1Price
+		}
+	}
+	if step == 4 {
+		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
+		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
+		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		next.LiquidityProviderCount = entity.IntAdd(next.LiquidityProviderCount, cached.LiquidityProviderCount)
+		if next.MutatedOnStep != 3 {
+			next.ReserveETH = cached.ReserveETH
+			next.ReserveUSD = cached.ReserveUSD
+		}
+	}
+}
 
 // PairHourData
 type PairHourData struct {
@@ -2936,6 +3081,20 @@ func NewPairHourData(id string) *PairHourData {
 
 func (_ *PairHourData) SkipDBLookup() bool {
 	return false
+}
+func (next *PairHourData) Merge(step int, cached *PairHourData) {
+	if step == 4 {
+		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
+		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.Pair = cached.Pair
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
+		}
+	}
 }
 
 // PairDayData
@@ -2972,6 +3131,24 @@ func NewPairDayData(id string) *PairDayData {
 func (_ *PairDayData) SkipDBLookup() bool {
 	return false
 }
+func (next *PairDayData) Merge(step int, cached *PairDayData) {
+	if step == 4 {
+		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
+		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
+		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
+		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
+		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
+		if next.MutatedOnStep != 3 {
+			next.Date = cached.Date
+			next.Pair = cached.Pair
+			next.Token0 = cached.Token0
+			next.Token1 = cached.Token1
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
+			next.ReserveUSD = cached.ReserveUSD
+		}
+	}
+}
 
 // LiquidityPosition
 type LiquidityPosition struct {
@@ -2992,6 +3169,17 @@ func NewLiquidityPosition(id string) *LiquidityPosition {
 
 func (_ *LiquidityPosition) SkipDBLookup() bool {
 	return false
+}
+func (next *LiquidityPosition) Merge(step int, cached *LiquidityPosition) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.User = cached.User
+			next.Pair = cached.Pair
+			next.LiquidityTokenBalance = cached.LiquidityTokenBalance
+			next.Block = cached.Block
+			next.Timestamp = cached.Timestamp
+		}
+	}
 }
 
 // LiquidityPositionSnapshot
@@ -3027,6 +3215,14 @@ func NewLiquidityPositionSnapshot(id string) *LiquidityPositionSnapshot {
 func (_ *LiquidityPositionSnapshot) SkipDBLookup() bool {
 	return false
 }
+func (next *LiquidityPositionSnapshot) Merge(step int, cached *LiquidityPositionSnapshot) {
+	if step == 4 {
+		next.LiquidityTokenTotalSupply = entity.FloatAdd(next.LiquidityTokenTotalSupply, cached.LiquidityTokenTotalSupply)
+		if next.MutatedOnStep != 3 {
+			next.LiquidityTokenBalance = cached.LiquidityTokenBalance
+		}
+	}
+}
 
 // Transaction
 type Transaction struct {
@@ -3049,6 +3245,14 @@ func NewTransaction(id string) *Transaction {
 func (_ *Transaction) SkipDBLookup() bool {
 	return false
 }
+func (next *Transaction) Merge(step int, cached *Transaction) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.BlockNumber = cached.BlockNumber
+			next.Timestamp = cached.Timestamp
+		}
+	}
+}
 
 // Mint
 type Mint struct {
@@ -3056,14 +3260,14 @@ type Mint struct {
 	Transaction  string        `db:"transaction" csv:"transaction"`
 	Timestamp    entity.Int    `db:"timestamp" csv:"timestamp"`
 	Pair         string        `db:"pair" csv:"pair"`
-	To           entity.Bytes  `db:"to" csv:"to"`
+	To           string        `db:"to" csv:"to"`
 	Liquidity    entity.Float  `db:"liquidity" csv:"liquidity"`
-	Sender       entity.Bytes  `db:"sender,nullable" csv:"sender"`
+	Sender       *string       `db:"sender,nullable" csv:"sender"`
 	Amount0      *entity.Float `db:"amount_0,nullable" csv:"amount_0"`
 	Amount1      *entity.Float `db:"amount_1,nullable" csv:"amount_1"`
 	LogIndex     *entity.Int   `db:"log_index,nullable" csv:"log_index"`
 	AmountUSD    *entity.Float `db:"amount_usd,nullable" csv:"amount_usd"`
-	FeeTo        entity.Bytes  `db:"fee_to,nullable" csv:"fee_to"`
+	FeeTo        *string       `db:"fee_to,nullable" csv:"fee_to"`
 	FeeLiquidity *entity.Float `db:"fee_liquidity,nullable" csv:"fee_liquidity"`
 }
 
@@ -3071,15 +3275,30 @@ func NewMint(id string) *Mint {
 	return &Mint{
 		Base:      entity.NewBase(id),
 		Timestamp: IL(0),
-		To:        []byte{},
 		Liquidity: FL(0),
-		Sender:    []byte{},
-		FeeTo:     []byte{},
 	}
 }
 
 func (_ *Mint) SkipDBLookup() bool {
 	return false
+}
+func (next *Mint) Merge(step int, cached *Mint) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.Transaction = cached.Transaction
+			next.Timestamp = cached.Timestamp
+			next.Pair = cached.Pair
+			next.To = cached.To
+			next.Liquidity = cached.Liquidity
+			next.Sender = cached.Sender
+			next.Amount0 = cached.Amount0
+			next.Amount1 = cached.Amount1
+			next.LogIndex = cached.LogIndex
+			next.AmountUSD = cached.AmountUSD
+			next.FeeTo = cached.FeeTo
+			next.FeeLiquidity = cached.FeeLiquidity
+		}
+	}
 }
 
 // Burn
@@ -3089,14 +3308,14 @@ type Burn struct {
 	Timestamp    entity.Int    `db:"timestamp" csv:"timestamp"`
 	Pair         string        `db:"pair" csv:"pair"`
 	Liquidity    entity.Float  `db:"liquidity" csv:"liquidity"`
-	Sender       entity.Bytes  `db:"sender,nullable" csv:"sender"`
+	Sender       *string       `db:"sender,nullable" csv:"sender"`
 	Amount0      *entity.Float `db:"amount_0,nullable" csv:"amount_0"`
 	Amount1      *entity.Float `db:"amount_1,nullable" csv:"amount_1"`
-	To           entity.Bytes  `db:"to,nullable" csv:"to"`
+	To           *string       `db:"to,nullable" csv:"to"`
 	LogIndex     *entity.Int   `db:"log_index,nullable" csv:"log_index"`
 	AmountUSD    *entity.Float `db:"amount_usd,nullable" csv:"amount_usd"`
 	Complete     entity.Bool   `db:"complete" csv:"complete"`
-	FeeTo        entity.Bytes  `db:"fee_to,nullable" csv:"fee_to"`
+	FeeTo        *string       `db:"fee_to,nullable" csv:"fee_to"`
 	FeeLiquidity *entity.Float `db:"fee_liquidity,nullable" csv:"fee_liquidity"`
 }
 
@@ -3105,14 +3324,30 @@ func NewBurn(id string) *Burn {
 		Base:      entity.NewBase(id),
 		Timestamp: IL(0),
 		Liquidity: FL(0),
-		Sender:    []byte{},
-		To:        []byte{},
-		FeeTo:     []byte{},
 	}
 }
 
 func (_ *Burn) SkipDBLookup() bool {
 	return false
+}
+func (next *Burn) Merge(step int, cached *Burn) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.Transaction = cached.Transaction
+			next.Timestamp = cached.Timestamp
+			next.Pair = cached.Pair
+			next.Liquidity = cached.Liquidity
+			next.Sender = cached.Sender
+			next.Amount0 = cached.Amount0
+			next.Amount1 = cached.Amount1
+			next.To = cached.To
+			next.LogIndex = cached.LogIndex
+			next.AmountUSD = cached.AmountUSD
+			next.Complete = cached.Complete
+			next.FeeTo = cached.FeeTo
+			next.FeeLiquidity = cached.FeeLiquidity
+		}
+	}
 }
 
 // Swap
@@ -3121,12 +3356,12 @@ type Swap struct {
 	Transaction string       `db:"transaction" csv:"transaction"`
 	Timestamp   entity.Int   `db:"timestamp" csv:"timestamp"`
 	Pair        string       `db:"pair" csv:"pair"`
-	Sender      entity.Bytes `db:"sender" csv:"sender"`
+	Sender      string       `db:"sender" csv:"sender"`
 	Amount0In   entity.Float `db:"amount_0_in" csv:"amount_0_in"`
 	Amount1In   entity.Float `db:"amount_1_in" csv:"amount_1_in"`
 	Amount0Out  entity.Float `db:"amount_0_out" csv:"amount_0_out"`
 	Amount1Out  entity.Float `db:"amount_1_out" csv:"amount_1_out"`
-	To          entity.Bytes `db:"to" csv:"to"`
+	To          string       `db:"to" csv:"to"`
 	LogIndex    *entity.Int  `db:"log_index,nullable" csv:"log_index"`
 	AmountUSD   entity.Float `db:"amount_usd" csv:"amount_usd"`
 }
@@ -3135,18 +3370,33 @@ func NewSwap(id string) *Swap {
 	return &Swap{
 		Base:       entity.NewBase(id),
 		Timestamp:  IL(0),
-		Sender:     []byte{},
 		Amount0In:  FL(0),
 		Amount1In:  FL(0),
 		Amount0Out: FL(0),
 		Amount1Out: FL(0),
-		To:         []byte{},
 		AmountUSD:  FL(0),
 	}
 }
 
 func (_ *Swap) SkipDBLookup() bool {
 	return false
+}
+func (next *Swap) Merge(step int, cached *Swap) {
+	if step == 4 {
+		if next.MutatedOnStep != 3 {
+			next.Transaction = cached.Transaction
+			next.Timestamp = cached.Timestamp
+			next.Pair = cached.Pair
+			next.Sender = cached.Sender
+			next.Amount0In = cached.Amount0In
+			next.Amount1In = cached.Amount1In
+			next.Amount0Out = cached.Amount0Out
+			next.Amount1Out = cached.Amount1Out
+			next.To = cached.To
+			next.LogIndex = cached.LogIndex
+			next.AmountUSD = cached.AmountUSD
+		}
+	}
 }
 
 func (s *Subgraph) HandleBlock(block *pbcodec.Block) error {
@@ -4206,11 +4456,11 @@ create table if not exists %%SCHEMA%%.mint
 
 	"pair" text not null,
 
-	"to" bytea not null,
+	"to" text not null,
 
 	"liquidity" numeric not null,
 
-	"sender" bytea,
+	"sender" text,
 
 	"amount_0" numeric,
 
@@ -4220,7 +4470,7 @@ create table if not exists %%SCHEMA%%.mint
 
 	"amount_usd" numeric,
 
-	"fee_to" bytea,
+	"fee_to" text,
 
 	"fee_liquidity" numeric,
 
@@ -4247,13 +4497,13 @@ create table if not exists %%SCHEMA%%.burn
 
 	"liquidity" numeric not null,
 
-	"sender" bytea,
+	"sender" text,
 
 	"amount_0" numeric,
 
 	"amount_1" numeric,
 
-	"to" bytea,
+	"to" text,
 
 	"log_index" numeric,
 
@@ -4261,7 +4511,7 @@ create table if not exists %%SCHEMA%%.burn
 
 	"complete" boolean not null,
 
-	"fee_to" bytea,
+	"fee_to" text,
 
 	"fee_liquidity" numeric,
 
@@ -4286,7 +4536,7 @@ create table if not exists %%SCHEMA%%.swap
 
 	"pair" text not null,
 
-	"sender" bytea not null,
+	"sender" text not null,
 
 	"amount_0_in" numeric not null,
 
@@ -4296,7 +4546,7 @@ create table if not exists %%SCHEMA%%.swap
 
 	"amount_1_out" numeric not null,
 
-	"to" bytea not null,
+	"to" text not null,
 
 	"log_index" numeric,
 
@@ -4608,11 +4858,6 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists token_volume_usd on %%SCHEMA%%.token using btree ("volume_usd");`,
-			dropStatement:   `drop index if exists %%SCHEMA%%.token_volume_usd;`,
-		})
-
-		indexes = append(indexes, &index{
 			createStatement: `create index if not exists token_untracked_volume_usd on %%SCHEMA%%.token using btree ("untracked_volume_usd");`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.token_untracked_volume_usd;`,
 		})
@@ -4847,16 +5092,6 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists pair_reserve_usd on %%SCHEMA%%.pair using btree ("reserve_usd");`,
-			dropStatement:   `drop index if exists %%SCHEMA%%.pair_reserve_usd;`,
-		})
-
-		indexes = append(indexes, &index{
-			createStatement: `create index if not exists pair_tracked_reserve_eth on %%SCHEMA%%.pair using btree ("tracked_reserve_eth");`,
-			dropStatement:   `drop index if exists %%SCHEMA%%.pair_tracked_reserve_eth;`,
-		})
-
-		indexes = append(indexes, &index{
 			createStatement: `create index if not exists pair_token_0_price on %%SCHEMA%%.pair using btree ("token_0_price");`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.pair_token_0_price;`,
 		})
@@ -4874,11 +5109,6 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		indexes = append(indexes, &index{
 			createStatement: `create index if not exists pair_volume_token_1 on %%SCHEMA%%.pair using btree ("volume_token_1");`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.pair_volume_token_1;`,
-		})
-
-		indexes = append(indexes, &index{
-			createStatement: `create index if not exists pair_volume_usd on %%SCHEMA%%.pair using btree ("volume_usd");`,
-			dropStatement:   `drop index if exists %%SCHEMA%%.pair_volume_usd;`,
 		})
 
 		indexes = append(indexes, &index{
@@ -5275,7 +5505,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists mint_to on %%SCHEMA%%.mint using btree ("to");`,
+			createStatement: `create index if not exists mint_to on %%SCHEMA%%.mint ("left"("to", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.mint_to;`,
 		})
 
@@ -5285,7 +5515,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists mint_sender on %%SCHEMA%%.mint using btree ("sender");`,
+			createStatement: `create index if not exists mint_sender on %%SCHEMA%%.mint ("left"("sender", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.mint_sender;`,
 		})
 
@@ -5310,7 +5540,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists mint_fee_to on %%SCHEMA%%.mint using btree ("fee_to");`,
+			createStatement: `create index if not exists mint_fee_to on %%SCHEMA%%.mint ("left"("fee_to", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.mint_fee_to;`,
 		})
 
@@ -5363,7 +5593,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists burn_sender on %%SCHEMA%%.burn using btree ("sender");`,
+			createStatement: `create index if not exists burn_sender on %%SCHEMA%%.burn ("left"("sender", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.burn_sender;`,
 		})
 
@@ -5378,7 +5608,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists burn_to on %%SCHEMA%%.burn using btree ("to");`,
+			createStatement: `create index if not exists burn_to on %%SCHEMA%%.burn ("left"("to", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.burn_to;`,
 		})
 
@@ -5398,7 +5628,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists burn_fee_to on %%SCHEMA%%.burn using btree ("fee_to");`,
+			createStatement: `create index if not exists burn_fee_to on %%SCHEMA%%.burn ("left"("fee_to", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.burn_fee_to;`,
 		})
 
@@ -5446,7 +5676,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists swap_sender on %%SCHEMA%%.swap using btree ("sender");`,
+			createStatement: `create index if not exists swap_sender on %%SCHEMA%%.swap ("left"("sender", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.swap_sender;`,
 		})
 
@@ -5471,7 +5701,7 @@ alter table only %%SCHEMA%%.swap alter column vid SET DEFAULT nextval('%%SCHEMA%
 		})
 
 		indexes = append(indexes, &index{
-			createStatement: `create index if not exists swap_to on %%SCHEMA%%.swap using btree ("to");`,
+			createStatement: `create index if not exists swap_to on %%SCHEMA%%.swap ("left"("to", 256));`,
 			dropStatement:   `drop index if exists %%SCHEMA%%.swap_to;`,
 		})
 

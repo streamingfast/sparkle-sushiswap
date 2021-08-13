@@ -101,7 +101,7 @@ func (s *Subgraph) HandlePairBurnEvent(ev *PairBurnEvent) error {
 		return err
 	}
 
-	position, err := s.createLiquidityPosition(eth.Address(burn.Sender), ev.LogAddress)
+	position, err := s.createLiquidityPosition(eth.MustNewAddress(*burn.Sender), ev.LogAddress)
 	if err != nil {
 		return err
 	}

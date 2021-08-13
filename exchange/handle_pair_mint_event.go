@@ -78,7 +78,8 @@ func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
 		return err
 	}
 
-	mint.Sender = ev.Sender.Bytes()
+	sender := ev.Sender.Pretty()
+	mint.Sender = &sender
 	mint.Amount0 = F(token0Amount).Ptr()
 	mint.Amount1 = F(token1Amount).Ptr()
 	mint.LogIndex = IL(int64(ev.LogIndex)).Ptr()
@@ -129,7 +130,7 @@ func (s *Subgraph) isCompleteMint(mintId string) (bool, error) {
 	senderStr := ""
 	var completed bool
 	if mint.Sender != nil {
-		senderStr = string(mint.Sender)
+		senderStr = *mint.Sender
 		completed = true
 	}
 	s.Log.Debug("checking if mint is completed", zap.String("mint_id", mintId), zap.Bool("completed", completed), zap.String("sender", senderStr))
