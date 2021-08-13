@@ -3,6 +3,7 @@ package exchange
 import (
 	"github.com/streamingfast/eth-go"
 	"github.com/streamingfast/sparkle/entity"
+
 	"go.uber.org/zap"
 )
 
@@ -48,7 +49,7 @@ func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
 	token0.TxCount = entity.IntAdd(token0.TxCount, IL(1))
 	token1.TxCount = entity.IntAdd(token1.TxCount, IL(1))
 
-	bundle , err := s.getBundle() // creates bundle if it does not exist
+	bundle, err := s.getBundle() // creates bundle if it does not exist
 	if err != nil {
 		return err
 	}

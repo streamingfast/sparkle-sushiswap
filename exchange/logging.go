@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"github.com/streamingfast/logging"
+
 	"go.uber.org/zap"
 )
 

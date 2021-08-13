@@ -2,7 +2,9 @@ package exchange
 
 import (
 	"encoding/json"
+
 	"github.com/streamingfast/eth-go"
+
 	"go.uber.org/zap"
 )
 

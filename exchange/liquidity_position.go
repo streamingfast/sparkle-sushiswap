@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"fmt"
+
 	"github.com/streamingfast/eth-go"
 )
 

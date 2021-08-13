@@ -2,10 +2,12 @@ package exchange
 
 import (
 	"fmt"
+	"math/big"
+
 	"github.com/streamingfast/eth-go"
 	"github.com/streamingfast/sparkle/entity"
+
 	"go.uber.org/zap"
-	"math/big"
 )
 
 func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {

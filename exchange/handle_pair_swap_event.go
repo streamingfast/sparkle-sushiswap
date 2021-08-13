@@ -2,9 +2,10 @@ package exchange
 
 import (
 	"fmt"
+	"math/big"
+
 	"github.com/streamingfast/eth-go"
 	"github.com/streamingfast/sparkle/entity"
-	"math/big"
 )
 
 func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
