@@ -87,8 +87,8 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 	if !token.Exists() {
 		tm, valid := s.GetTokenInfo(tokenAddress, validateToken)
 		if !valid {
-			s.Log.Info("token 0 is invalid, skipping creating pair",
-				zap.String("token0", tokenAddress.Pretty()),
+			s.Log.Info("token is invalid",
+				zap.String("token", tokenAddress.Pretty()),
 				zap.Uint64("block_number", s.Block().Number()),
 				zap.String("block_id", s.Block().ID()),
 			)
@@ -101,7 +101,7 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 		token.DerivedETH = FL(0)
 
 		if err := s.Save(token); err != nil {
-			return nil, fmt.Errorf("saving initialToken 0: %w", err)
+			return nil, fmt.Errorf("saving token: %w", err)
 		}
 	}
 
