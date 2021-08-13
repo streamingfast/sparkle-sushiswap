@@ -48,8 +48,8 @@ func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
 	token0.TxCount = entity.IntAdd(token0.TxCount, IL(1))
 	token1.TxCount = entity.IntAdd(token1.TxCount, IL(1))
 
-	bundle := NewBundle("1")
-	if err := s.Load(bundle); err != nil {
+	bundle , err := s.getBundle() // creates bundle if it does not exist
+	if err != nil {
 		return err
 	}
 	amountTotalUSD := bf().Mul(

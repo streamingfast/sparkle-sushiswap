@@ -14,8 +14,8 @@ func (s *Subgraph) HandleFactoryPairCreatedEvent(ev *FactoryPairCreatedEvent) er
 	}
 
 	if !factory.Exists() {
-		bundle := NewBundle("1")
-		if err := s.Save(bundle); err != nil {
+		_, err := s.getBundle() // creates bundle if it does not exist
+		if err != nil {
 			return err
 		}
 	}
@@ -51,6 +51,10 @@ func (s *Subgraph) getPair(pairAddress, token0Address, token1Address eth.Address
 	}
 
 	if pair.Exists() {
+		return pair, nil
+	}
+
+	if token0Address == nil && token1Address == nil {
 		return pair, nil
 	}
 

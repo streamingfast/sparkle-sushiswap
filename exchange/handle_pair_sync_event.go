@@ -50,7 +50,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		pair.ReserveETH.Float(),
 	))
 
-	s.Log.Debug("removed tracked reserved BNB", zap.Stringer("value", factory.LiquidityETH.Float()))
+	s.Log.Debug("removed tracked reserved ETH", zap.Stringer("value", factory.LiquidityETH.Float()))
 
 	token0.Liquidity = F(bf().Sub(token0.Liquidity.Float(), pair.Reserve0.Float()))
 	token1.Liquidity = F(bf().Sub(token1.Liquidity.Float(), pair.Reserve1.Float()))
@@ -93,8 +93,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return nil
 	}
 
-	bundle := NewBundle("1")
-	if err := s.Load(bundle); err != nil {
+	bundle , err := s.getBundle() // creates bundle if it does not exist
+	if err != nil {
 		return err
 	}
 
@@ -103,7 +103,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	if err := s.Save(bundle); err != nil {
 		return err
 	}
-	s.Log.Debug("updated bundle price", zap.Reflect("bundle", bundle), zap.Any("prev_bnb_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
+	s.Log.Debug("updated bundle price", zap.Reflect("bundle", bundle), zap.Any("prev_eth_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
 
 	t0DerivedETH, err := s.FindEthPerToken(token0)
 	if err != nil {
@@ -144,7 +144,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		)
 	}
 
-	s.Log.Debug("new tracked liquidity bnb in the pair",
+	s.Log.Debug("new tracked liquidity eth in the pair",
 		zap.String("value", trackedLiquidityETH.Text('g', -1)),
 	)
 
@@ -168,7 +168,6 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	))
 
 	// use tracked amounts globally
-
 	factory.LiquidityETH = entity.FloatAdd(factory.LiquidityETH, F(trackedLiquidityETH))
 	factory.LiquidityUSD = F(bf().Mul(
 		factory.LiquidityETH.Float(),

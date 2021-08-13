@@ -36,14 +36,13 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	amount0Total := bf().Add(amount0Out, amount0In)
 	amount1Total := bf().Add(amount1Out, amount1In)
 
-	//// BNB/USD prices
-	bundle := NewBundle("1")
-	err = s.Load(bundle)
+	// ETH/USD prices
+	bundle, err := s.getBundle()
 	if err != nil {
-		return fmt.Errorf("loading bundle: %w", err)
+		return err
 	}
 
-	// get total amounts of derived USD and BNB for tracking
+	// get total amounts of derived USD and ETH for tracking
 	derivedAmountETH := bf().Quo(
 		bf().Add(
 			bf().Mul(token1.DerivedETH.Float(), amount1Total),
@@ -57,12 +56,11 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	// only accounts for volume through white listed tokens
 	trackedAmountUSD := getTrackedVolumeUSD(bundle, amount0Total, token0, amount1Total, token1, pair)
 
-	//let trackedAmountBNB: BigDecimal
-	var trackedAmountBNB *big.Float
+	var trackedAmountETH *big.Float
 	if bundle.EthPrice.Float().Cmp(big.NewFloat(0)) == 0 {
-		trackedAmountBNB = big.NewFloat(0)
+		trackedAmountETH = big.NewFloat(0)
 	} else {
-		trackedAmountBNB = bf().Quo(trackedAmountUSD, bundle.EthPrice.Float())
+		trackedAmountETH = bf().Quo(trackedAmountUSD, bundle.EthPrice.Float())
 	}
 
 	// @ steps 3 trade  volume is realtive per shard
@@ -102,7 +100,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	}
 
 	factory.VolumeUSD = entity.FloatAdd(factory.VolumeUSD, F(trackedAmountUSD))
-	factory.VolumeETH = entity.FloatAdd(factory.VolumeETH, F(trackedAmountBNB))
+	factory.VolumeETH = entity.FloatAdd(factory.VolumeETH, F(trackedAmountETH))
 	factory.UntrackedVolumeUSD = entity.FloatAdd(factory.UntrackedVolumeUSD, F(derivedAmountUSD))
 
 	factory.TxCount = entity.IntAdd(factory.TxCount, IL(1))
@@ -190,7 +188,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	}
 
 	dayData.VolumeUSD = entity.FloatAdd(dayData.VolumeUSD, F(trackedAmountUSD))
-	dayData.VolumeETH = entity.FloatAdd(dayData.VolumeETH, F(trackedAmountBNB))
+	dayData.VolumeETH = entity.FloatAdd(dayData.VolumeETH, F(trackedAmountETH))
 	dayData.UntrackedVolume = entity.FloatAdd(dayData.UntrackedVolume, F(derivedAmountUSD))
 
 	err = s.Save(dayData)
