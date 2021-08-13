@@ -103,7 +103,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	if err := s.Save(bundle); err != nil {
 		return err
 	}
-	s.Log.Debug("updated bundle price", zap.Reflect("bundle", bundle), zap.Any("prev_bnb_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", event.Transaction.Hash))
+	s.Log.Debug("updated bundle price", zap.Reflect("bundle", bundle), zap.Any("prev_bnb_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
 
 	t0DerivedETH, err := s.FindEthPerToken(token0)
 	if err != nil {
