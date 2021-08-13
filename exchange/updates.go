@@ -12,7 +12,7 @@ func (s *Subgraph) UpdateFactoryDayData() (*DayData, error) {
 	factory := NewFactory(FactoryAddress)
 	err := s.Load(factory)
 	if err != nil {
-		return nil, fmt.Errorf("loading pancake factory: %w", err)
+		return nil, fmt.Errorf("loading factory: %w", err)
 	}
 
 	timestamp := s.Block().Timestamp().Unix()

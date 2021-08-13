@@ -42,7 +42,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	s.Log.Debug("handler sync pre dump",
 		zap.Reflect("token0", token0),
 		zap.Reflect("token1", token1),
-		zap.Reflect("pancake", factory),
+		zap.Reflect("factory", factory),
 		zap.Reflect("pair", pair),
 	)
 

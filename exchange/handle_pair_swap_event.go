@@ -97,7 +97,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	factory := NewFactory(FactoryAddress)
 	err = s.Load(factory)
 	if err != nil {
-		return fmt.Errorf("loading pancake factory: %w", err)
+		return fmt.Errorf("loading factory: %w", err)
 	}
 
 	factory.VolumeUSD = entity.FloatAdd(factory.VolumeUSD, F(trackedAmountUSD))
@@ -116,7 +116,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	}
 
 	if err := s.Save(factory); err != nil {
-		return fmt.Errorf("saving pancake: %w", err)
+		return fmt.Errorf("saving factory: %w", err)
 	}
 
 	transaction := NewTransaction(ev.Transaction.Hash.Pretty())
@@ -175,7 +175,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 
 	dayData, err := s.UpdateFactoryDayData()
 	if err != nil {
-		return fmt.Errorf("update pancake day data: %w", err)
+		return fmt.Errorf("update day data: %w", err)
 	}
 
 	token0DayData, err := s.UpdateTokenDayData(ev.LogAddress, token0, bundle)
