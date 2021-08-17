@@ -49,7 +49,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	// reset factory liquidity by subtracting only tracked liquidity
 	factory.LiquidityETH = F(bf().Sub(
 		factory.LiquidityETH.Float(),
-		pair.ReserveETH.Float(),
+		pair.TrackedReserveETH.Float(),
 	))
 
 	s.Log.Debug("removed tracked reserved ETH", zap.Stringer("value", factory.LiquidityETH.Float()))
@@ -95,7 +95,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return nil
 	}
 
-	bundle , err := s.getBundle() // creates bundle if it does not exist
+	bundle, err := s.getBundle() // creates bundle if it does not exist
 	if err != nil {
 		return err
 	}
