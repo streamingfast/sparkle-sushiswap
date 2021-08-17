@@ -38,6 +38,10 @@ func (s *Subgraph) HandlePairBurnEvent(ev *PairBurnEvent) error {
 		burn.Liquidity = FL(0)
 		burn.Transaction = transaction.ID
 		burn.Timestamp = transaction.Timestamp
+		if burn.Sender == nil {
+			sender := ""
+			burn.Sender = &sender
+		}
 	}
 
 	factory, err := s.getFactory()
