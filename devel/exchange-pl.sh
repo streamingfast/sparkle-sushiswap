@@ -1,8 +1,9 @@
 #!/bin/bash
+set -x;
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-STOREURL=gs://dfuseio-global-blocks-us/eth-bsc-mainnet/v1
-if test -d ./localblocks; then
+STOREURL=gs://dfuseio-global-blocks-us/eth-mainnet/v5
+if test -d ../localblocks; then
   echo "Using blocks from local store: ./localblocks"
     STOREURL=./localblocks
   else
@@ -11,9 +12,12 @@ if test -d ./localblocks; then
 ######
 
 mkdir ./localblocks
-gsutil -m cp "gs://dfuseio-global-blocks-us/eth-bsc-mainnet/v1/0006809*" ./localblocks/
-gsutil -m cp "gs://dfuseio-global-blocks-us/eth-bsc-mainnet/v1/0006810*" ./localblocks/
-gsutil -m cp "gs://dfuseio-global-blocks-us/eth-bsc-mainnet/v1/0006811*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001079*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001080*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001081*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001082*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001083*" ./localblocks/
+gsutil -m cp "gs://dfuseio-global-blocks-us/eth-mainnet/v5/001084*" ./localblocks/
 
 ######
 EOC
@@ -43,9 +47,11 @@ main() {
       echo "LAUNCHING STEP 1"
       rm -rf ./step1-v1
 
-      step1 6809700 6829699
-      step1 6829700 6849699
-      step1 6849700 6889699
+
+      step1 10794229 10804228
+      step1 10804229 10814228
+      step1 10814229 10824228
+      step1 10824229 10834228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -59,9 +65,10 @@ main() {
       echo "LAUNCHING STEP 2"
       rm -rf ./step2-v1
 
-      step2 6809700 6829699
-      step2 6829700 6849699
-      step2 6849700 6889699
+      step2 10794229 10804228
+      step2 10804229 10814228
+      step2 10814229 10824228
+      step2 10824229 10834228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -75,9 +82,10 @@ main() {
       echo "LAUNCHING STEP 3"
       rm -rf ./step3-v1
 
-      step3 6809700 6829699
-      step3 6829700 6849699
-      step3 6849700 6889699
+      step3 10794229 10804228
+      step3 10804229 10814228
+      step3 10814229 10824228
+      step3 10824229 10834228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -91,9 +99,16 @@ main() {
       echo "LAUNCHING STEP 4"
       rm -rf ./step4-v1
 
-      step4 6809737 6810736
-      step4 6810737 6811736
-#      step4  6811737 6812737
+      step4 10794229 10804228
+      step4 10804229 10814228
+      step4 10814229 10824228
+      step4 10824229 10834228
+#      step4 10834229 10844228
+#      step4 10844229 10854228
+#      step4 10854229 10864228
+#      step4 10864229 10874228
+#      step4 10874229 10884228
+#      step4 10884229 10894228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
