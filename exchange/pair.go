@@ -96,6 +96,7 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 	}
 
 	token.Factory = factory.ID
+	//token.TotalSupply = I(tm.TotalSupply) // TODO(sf): fix this value.
 	token.Name = tm.Name
 	token.Symbol = tm.Symbol
 	token.Decimals = IL(int64(tm.Decimals))
