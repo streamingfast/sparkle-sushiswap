@@ -27,6 +27,7 @@ func (s *Subgraph) UpdateFactoryDayData() (*DayData, error) {
 
 	if !dayData.Exists() {
 		dayData = NewDayData(strconv.FormatInt(dayId, 10))
+		dayData.Factory = FactoryAddress
 		dayData.Date = dayStartTimestamp
 	}
 

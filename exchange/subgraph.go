@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/streamingfast/eth-go"
 
@@ -53,8 +54,12 @@ func (s *Subgraph) getPairAddressForTokens(token0, token1 string) string {
 }
 
 func generateTokensKey(token0, token1 string) string {
+	token0 = strings.ToLower(token0)
+	token1 = strings.ToLower(token1)
+
 	if token0 > token1 {
 		return token1 + token0
 	}
+
 	return token0 + token1
 }

@@ -100,23 +100,23 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return fmt.Errorf("loading factory: %w", err)
 	}
 
-	factory.VolumeUSD = entity.FloatAdd(factory.VolumeUSD, F(trackedAmountUSD))
-	factory.VolumeETH = entity.FloatAdd(factory.VolumeETH, F(trackedAmountETH))
-	factory.UntrackedVolumeUSD = entity.FloatAdd(factory.UntrackedVolumeUSD, F(derivedAmountUSD))
+	if !isBlacklistedAddress(token0.ID) && !isBlacklistedAddress(token1.ID) {
+		factory.VolumeUSD = entity.FloatAdd(factory.VolumeUSD, F(trackedAmountUSD))
+		factory.VolumeETH = entity.FloatAdd(factory.VolumeETH, F(trackedAmountETH))
+		factory.UntrackedVolumeUSD = entity.FloatAdd(factory.UntrackedVolumeUSD, F(derivedAmountUSD))
+		factory.TxCount = entity.IntAdd(factory.TxCount, IL(1))
+		if err := s.Save(factory); err != nil {
+			return fmt.Errorf("saving factory: %w", err)
+		}
+	}
 
-	factory.TxCount = entity.IntAdd(factory.TxCount, IL(1))
 	// save entities
-
 	if err := s.Save(token0); err != nil {
 		return fmt.Errorf("saving initialToken 0: %w", err)
 	}
 
 	if err := s.Save(token1); err != nil {
 		return fmt.Errorf("saving initialToken 1: %w", err)
-	}
-
-	if err := s.Save(factory); err != nil {
-		return fmt.Errorf("saving factory: %w", err)
 	}
 
 	transaction := NewTransaction(ev.Transaction.Hash.Pretty())
@@ -188,13 +188,14 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return fmt.Errorf("udpate token1 day data: %w", err)
 	}
 
-	dayData.VolumeUSD = entity.FloatAdd(dayData.VolumeUSD, F(trackedAmountUSD))
-	dayData.VolumeETH = entity.FloatAdd(dayData.VolumeETH, F(trackedAmountETH))
-	dayData.UntrackedVolume = entity.FloatAdd(dayData.UntrackedVolume, F(derivedAmountUSD))
-
-	err = s.Save(dayData)
-	if err != nil {
-		return err
+	if !isBlacklistedAddress(token0.ID) && !isBlacklistedAddress(token1.ID) {
+		dayData.VolumeUSD = entity.FloatAdd(dayData.VolumeUSD, F(trackedAmountUSD))
+		dayData.VolumeETH = entity.FloatAdd(dayData.VolumeETH, F(trackedAmountETH))
+		dayData.UntrackedVolume = entity.FloatAdd(dayData.UntrackedVolume, F(derivedAmountUSD))
+		err = s.Save(dayData)
+		if err != nil {
+			return err
+		}
 	}
 
 	pairDayData.VolumeToken0 = entity.FloatAdd(pairDayData.VolumeToken0, F(amount0Total))

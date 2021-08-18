@@ -117,8 +117,10 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 		weightedDaiPrice := bf().Mul(daiPrice, daiWeight).SetPrec(100)
 		weightedUsdcPrice := bf().Mul(usdcPrice, usdcWeight).SetPrec(100)
 		weightedUsdtPrice := bf().Mul(usdtPrice, usdtWeight).SetPrec(100)
+		weightedPrice := bf().Add(weightedDaiPrice, bf().Add(weightedUsdcPrice, weightedUsdtPrice)).SetPrec(100)
 
-		return bf().Add(weightedDaiPrice, bf().Add(weightedUsdcPrice, weightedUsdtPrice)).SetPrec(100), nil
+		s.Log.Debug("eth price calculated from dai/usdc", zap.Stringer("price", weightedPrice))
+		return weightedPrice, nil
 	} else if daiPair.Exists() && isDaiPairLiquidEnough && usdcPair.Exists() && isUsdcPairLiquidEnough {
 		isDaiFirst := daiPair.Token0 == DAI
 		isUsdcFirst := usdcPair.Token0 == USDC
@@ -169,8 +171,10 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 
 		weightedDaiPrice := bf().Mul(daiPrice, daiWeight).SetPrec(100)
 		weightedUsdcPrice := bf().Mul(usdcPrice, usdcWeight).SetPrec(100)
+		weightedPrice := bf().Add(weightedDaiPrice, weightedUsdcPrice).SetPrec(100)
 
-		return bf().Add(weightedDaiPrice, weightedUsdcPrice).SetPrec(100), nil
+		s.Log.Debug("eth price calculated from dai/usdc", zap.Stringer("price", weightedPrice))
+		return weightedPrice, nil
 	} else if usdcPair.Exists() && isUsdcPairLiquidEnough {
 		isUsdcFirst := usdcPair.Token0 == USDC
 
@@ -181,6 +185,7 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 			usdcPrice = usdcPair.Token1Price.Float()
 		}
 
+		s.Log.Debug("eth price calculated from usdc", zap.Stringer("price", usdcPrice))
 		return usdcPrice.SetPrec(100), nil
 	} else if usdtPair.Exists() && isUsdtPairLiquidEnough {
 		isUsdtFirst := usdtPair.Token0 == USDT
@@ -192,6 +197,7 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 			usdtPrice = usdtPair.Token1Price.Float()
 		}
 
+		s.Log.Debug("eth price calculated from usdt", zap.Stringer("price", usdtPrice))
 		return usdtPrice.SetPrec(100), nil
 	} else if daiPair.Exists() && isDaiPairLiquidEnough {
 		isDaiFirst := daiPair.Token0 == DAI
@@ -203,9 +209,11 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 			daiPrice = daiPair.Token1Price.Float()
 		}
 
+		s.Log.Debug("eth price calculated from dai", zap.Stringer("price", daiPrice))
 		return daiPrice.SetPrec(100), nil
 	}
 
+	s.Log.Debug("eth price could not be calculated")
 	return big.NewFloat(0), nil
 }
 
@@ -215,13 +223,7 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 		return big.NewFloat(1), nil
 	}
 
-	for _, otherToken := range token.WhitelistPairs {
-		pairAddress := s.getPairAddressForTokens(tokenAddress, otherToken)
-		if pairAddress == "" {
-			s.Log.Debug("pair not found for tokens", zap.String("left", tokenAddress), zap.String("right", otherToken))
-			continue
-		}
-
+	for _, pairAddress := range token.WhitelistPairs {
 		pair := NewPair(pairAddress)
 		if err := s.Load(pair); err != nil {
 			return nil, err
@@ -243,6 +245,7 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 		}
 	}
 
+	s.Log.Debug("no whitelisted pairs ")
 	return big.NewFloat(0), nil
 }
 
@@ -365,7 +368,12 @@ var whitelist = []string{
 	"0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
 }
 
+var blacklist = []string{
+	"0x9ea3b5b4ec044b70375236a281986106457b20ef",
+}
+
 var whitelistCacheMap = map[string]bool{}
+var blacklistCacheMap = map[string]bool{}
 
 func isWhitelistedAddress(address string) bool {
 	address = strings.ToLower(address)
@@ -380,6 +388,25 @@ func isWhitelistedAddress(address string) bool {
 		}
 
 		whitelistCacheMap[address] = true
+		return true
+	}
+
+	return false
+}
+
+func isBlacklistedAddress(address string) bool {
+	address = strings.ToLower(address)
+
+	if _, ok := blacklistCacheMap[address]; ok {
+		return true
+	}
+
+	for _, addr := range blacklist {
+		if strings.ToLower(addr) != address {
+			continue
+		}
+
+		blacklistCacheMap[address] = true
 		return true
 	}
 

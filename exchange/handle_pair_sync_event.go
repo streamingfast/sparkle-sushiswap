@@ -78,8 +78,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	)
 
 	// We need to compute the ETH price *before* we save the pair (code just below)
-	// the reason for this, is that we don't want the reserver that are set above to affect
-	// the calcualtion of the ETH price (this was taken from the typsecript code)
+	// the reason for this, is that we don't want the reserves that are set above to affect
+	// the calculation of the ETH price (this was taken from the typsecript code)
 	ethPrice, err := s.GetEthPriceInUSD()
 	if err != nil {
 		return err
@@ -151,7 +151,14 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	)
 
 	// use derived amounts within pair
-	pair.ReserveETH = F(trackedLiquidityETH)
+	pair.TrackedReserveETH = F(trackedLiquidityETH)
+
+	s.Log.Debug("calculating pair reserve eth",
+		zap.Stringer("pair.reserve0", pair.Reserve0),
+		zap.Stringer("token0.derviedEth", t0DerivedETH),
+		zap.Stringer("pair.reserve1", pair.Reserve1),
+		zap.Stringer("token0.derviedEth", t1DerivedETH),
+	)
 
 	pair.ReserveETH = F(bf().Add(
 		bf().Mul(
