@@ -298,7 +298,7 @@ type Token @entity {
 
   derivedETH: BigDecimal! @parallel(step: 2)
 
-  whitelistPairs: [Pair!]! @parallel(step: 1)
+  whitelistPairs: [Pair!]! @parallel(step: 3)
 
   # Token hour data
   hourData: [TokenHourData!]! @derivedFrom(field: "token")
@@ -522,16 +522,16 @@ type LiquidityPosition @entity {
 # saved over time for return calculations, gets created and never updated
 type LiquidityPositionSnapshot @entity {
   id: ID!
-  liquidityPosition: LiquidityPosition!
-  timestamp: Int! # saved for fast historical lookups
-  block: Int! # saved for fast historical lookups
-  user: User! # reference to user
-  pair: Pair! # reference to pair
-  token0PriceUSD: BigDecimal! # snapshot of token0 price
-  token1PriceUSD: BigDecimal! # snapshot of token1 price
-  reserve0: BigDecimal! # snapshot of pair token0 reserves
-  reserve1: BigDecimal! # snapshot of pair token1 reserves
-  reserveUSD: BigDecimal! # snapshot of pair reserves in USD
+  liquidityPosition: LiquidityPosition! @parallel(step: 3)
+  timestamp: Int! @parallel(step: 3) # saved for fast historical lookups
+  block: Int! @parallel(step: 3) # saved for fast historical lookups
+  user: User! @parallel(step: 3) # reference to user
+  pair: Pair! @parallel(step: 3) # reference to pair
+  token0PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token0 price
+  token1PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token1 price
+  reserve0: BigDecimal! @parallel(step: 3) # snapshot of pair token0 reserves
+  reserve1: BigDecimal! @parallel(step: 3) # snapshot of pair token1 reserves
+  reserveUSD: BigDecimal! @parallel(step: 3) # snapshot of pair reserves in USD
   liquidityTokenTotalSupply: BigDecimal! @parallel(step: 3, type: SUM) # snapshot of pool token supply
   # snapshot of users pool token balance
   liquidityTokenBalance: BigDecimal! @parallel(step: 3)
@@ -2851,7 +2851,6 @@ func (next *Token) Merge(step int, cached *Token) {
 			next.Symbol = cached.Symbol
 			next.Name = cached.Name
 			next.Decimals = cached.Decimals
-			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
 	if step == 3 {
@@ -2867,6 +2866,7 @@ func (next *Token) Merge(step int, cached *Token) {
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.Liquidity = entity.FloatAdd(next.Liquidity, cached.Liquidity)
 		if next.MutatedOnStep != 3 {
+			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
 }
@@ -3219,6 +3219,16 @@ func (next *LiquidityPositionSnapshot) Merge(step int, cached *LiquidityPosition
 	if step == 4 {
 		next.LiquidityTokenTotalSupply = entity.FloatAdd(next.LiquidityTokenTotalSupply, cached.LiquidityTokenTotalSupply)
 		if next.MutatedOnStep != 3 {
+			next.LiquidityPosition = cached.LiquidityPosition
+			next.Timestamp = cached.Timestamp
+			next.Block = cached.Block
+			next.User = cached.User
+			next.Pair = cached.Pair
+			next.Token0PriceUSD = cached.Token0PriceUSD
+			next.Token1PriceUSD = cached.Token1PriceUSD
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
+			next.ReserveUSD = cached.ReserveUSD
 			next.LiquidityTokenBalance = cached.LiquidityTokenBalance
 		}
 	}

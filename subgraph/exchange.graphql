@@ -156,7 +156,7 @@ type Token @entity {
 
   derivedETH: BigDecimal! @parallel(step: 2)
 
-  whitelistPairs: [Pair!]! @parallel(step: 1)
+  whitelistPairs: [Pair!]! @parallel(step: 3)
 
   # Token hour data
   hourData: [TokenHourData!]! @derivedFrom(field: "token")
