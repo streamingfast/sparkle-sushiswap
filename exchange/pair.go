@@ -34,11 +34,11 @@ func (s *Subgraph) getPair(pairAddress, token0Address, token1Address eth.Address
 	}
 
 	if isWhitelistedAddress(token0.ID) {
-		token0.WhitelistPairs = append(token0.WhitelistPairs, pairAddress.Pretty())
+		token1.WhitelistPairs = append(token1.WhitelistPairs, pairAddress.Pretty())
 	}
 
 	if isWhitelistedAddress(token1.ID) {
-		token1.WhitelistPairs = append(token1.WhitelistPairs, pairAddress.Pretty())
+		token0.WhitelistPairs = append(token0.WhitelistPairs, pairAddress.Pretty())
 	}
 
 	if err := s.Save(token0); err != nil {
