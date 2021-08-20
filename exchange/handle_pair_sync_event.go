@@ -29,10 +29,14 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return fmt.Errorf("loading token 0: %s of pair: %s:%w", pair.Token0, ev.LogAddress.Pretty(), err)
 	}
 
+	s.Log.Debug("current derived eth token 0", zap.Stringer("value", token0.DerivedETH))
+
 	token1, err := s.getToken(eth.MustNewAddress(pair.Token1))
 	if err := s.Load(token1); err != nil {
 		return fmt.Errorf("loading token 1: %s of pair: %s :%w", pair.Token1, ev.LogAddress.Pretty(), err)
 	}
+
+	s.Log.Debug("current derived eth token 1", zap.Stringer("value", token1.DerivedETH))
 
 	factory := NewFactory(FactoryAddress)
 	if err := s.Load(factory); err != nil {
@@ -107,6 +111,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 	s.Log.Debug("updated bundle price", zap.Reflect("bundle", bundle), zap.Any("prev_eth_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
 
+	s.Log.Debug("calculating t0 derived price", zap.String("token0", token0.ID))
 	t0DerivedETH, err := s.FindEthPerToken(token0)
 	if err != nil {
 		return err
@@ -119,6 +124,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
+	s.Log.Debug("calculating t1 derived price", zap.String("token1", token1.ID))
 	t1DerivedETH, err := s.FindEthPerToken(token1)
 	if err != nil {
 		return err
@@ -160,7 +166,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		zap.Stringer("token0.derviedEth", t1DerivedETH),
 	)
 
-	pair.ReserveETH = F(bf().Add(
+	reserveEth := F(bf().Add(
 		bf().Mul(
 			pair.Reserve0.Float(),
 			t0DerivedETH,
@@ -170,6 +176,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 			t1DerivedETH,
 		),
 	))
+
+	pair.ReserveETH = reserveEth
 
 	pair.ReserveUSD = F(bf().Mul(
 		pair.ReserveETH.Float(),
