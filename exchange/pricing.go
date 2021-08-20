@@ -70,27 +70,27 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 			usdtPairEth = usdtPair.Reserve0.Float()
 		}
 
-		totalLiquidityEth := bf().Add(daiPairEth, bf().Add(usdcPairEth, usdtPairEth))
+		totalLiquidityEth := bf().Add(daiPairEth, bf().Add(usdcPairEth, usdtPairEth).SetPrec(100)).SetPrec(100)
 
 		var daiWeight *big.Float
 		if !isDaiFirst {
-			daiWeight = bf().Quo(daiPair.Reserve0.Float(), totalLiquidityEth)
+			daiWeight = bf().Quo(daiPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
-			daiWeight = bf().Quo(daiPair.Reserve1.Float(), totalLiquidityEth)
+			daiWeight = bf().Quo(daiPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
 		}
 
 		var usdcWeight *big.Float
 		if !isDaiFirst {
-			usdcWeight = bf().Quo(usdcPair.Reserve0.Float(), totalLiquidityEth)
+			usdcWeight = bf().Quo(usdcPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
-			usdcWeight = bf().Quo(usdcPair.Reserve1.Float(), totalLiquidityEth)
+			usdcWeight = bf().Quo(usdcPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
 		}
 
 		var usdtWeight *big.Float
 		if !isDaiFirst {
-			usdtWeight = bf().Quo(usdtPair.Reserve0.Float(), totalLiquidityEth)
+			usdtWeight = bf().Quo(usdtPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
-			usdtWeight = bf().Quo(usdtPair.Reserve1.Float(), totalLiquidityEth)
+			usdtWeight = bf().Quo(usdtPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
 		}
 
 		var daiPrice *big.Float
@@ -139,20 +139,20 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 			usdcPairEth = usdcPair.Reserve0.Float()
 		}
 
-		totalLiquidityEth := bf().Add(daiPairEth, usdcPairEth)
+		totalLiquidityEth := bf().Add(daiPairEth, usdcPairEth).SetPrec(100)
 
 		var daiWeight *big.Float
 		if !isDaiFirst {
-			daiWeight = bf().Quo(daiPair.Reserve0.Float(), totalLiquidityEth)
+			daiWeight = bf().Quo(daiPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
-			daiWeight = bf().Quo(daiPair.Reserve1.Float(), totalLiquidityEth)
+			daiWeight = bf().Quo(daiPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
 		}
 
 		var usdcWeight *big.Float
 		if !isDaiFirst {
-			usdcWeight = bf().Quo(usdcPair.Reserve0.Float(), totalLiquidityEth)
+			usdcWeight = bf().Quo(usdcPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
-			usdcWeight = bf().Quo(usdcPair.Reserve1.Float(), totalLiquidityEth)
+			usdcWeight = bf().Quo(usdcPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
 		}
 
 		var daiPrice *big.Float

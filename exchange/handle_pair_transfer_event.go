@@ -26,6 +26,18 @@ func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
 		return nil
 	}
 
+	factory, err := s.getFactory()
+	if err != nil {
+		return err
+	}
+
+	if _, err := s.getUser(ev.From); err != nil {
+		return err
+	}
+	if _, err := s.getUser(ev.To); err != nil {
+		return err
+	}
+
 	// get pair and load contract
 	pair := NewPair(ev.LogAddress.Pretty())
 	if err := s.Load(pair); err != nil {
@@ -80,6 +92,10 @@ func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
 			trx.Mints = append(trx.Mints, mint.ID)
 			if err := s.Save(trx); err != nil {
 				return fmt.Errorf("saving trx: %w", err)
+			}
+
+			if err := s.Save(factory); err != nil {
+				return fmt.Errorf("saving factory: %w", err)
 			}
 		}
 	}
