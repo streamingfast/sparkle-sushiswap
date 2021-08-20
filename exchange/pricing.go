@@ -240,7 +240,6 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 			if err := s.Load(token1); err != nil {
 				return nil, err
 			}
-			s.Log.Debug("matched on token 0", zap.Bool("token1_exists", token1.Exists()), zap.Stringer("token1_derived_eth", token1.DerivedETH))
 			return bf().Mul(pair.Token1Price.Float(), token1.DerivedETH.Float()), nil
 		}
 		if pair.Token1 == tokenAddress && pair.ReserveETH.Float().Cmp(MinimumLiquidityThresholdEth) > 0 {
@@ -248,7 +247,6 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 			if err := s.Load(token0); err != nil {
 				return nil, err
 			}
-			s.Log.Debug("matched on token 0", zap.Bool("token1_exists", token0.Exists()), zap.Stringer("token1_derived_eth", token0.DerivedETH))
 			return bf().Mul(pair.Token0Price.Float(), token0.DerivedETH.Float()), nil
 		}
 	}

@@ -64,16 +64,25 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	pair.Reserve0 = F(entity.ConvertTokenToDecimal(ev.Reserve0, token0.Decimals.Int().Int64()))
 	pair.Reserve1 = F(entity.ConvertTokenToDecimal(ev.Reserve1, token1.Decimals.Int().Int64()))
 
+	zlog.Debug("pair token0 price before", zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 	if pair.Reserve1.Float().Cmp(bf()) != 0 {
 		pair.Token0Price = F(bf().Quo(pair.Reserve0.Float(), pair.Reserve1.Float()))
 	} else {
 		pair.Token0Price = FL(0)
 	}
+	zlog.Debug("pair token0 price after", zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 
+	zlog.Debug("pair token1 price before", zap.String("value", pair.Token1Price.Float().Text('g', -1)))
 	if pair.Reserve0.Float().Cmp(bf()) != 0 {
 		pair.Token1Price = F(bf().Quo(pair.Reserve1.Float(), pair.Reserve0.Float()))
 	} else {
 		pair.Token1Price = FL(0)
+	}
+	zlog.Debug("pair token1 price after", zap.String("value", pair.Token1Price.Float().Text('g', -1)))
+
+	err = s.Save(pair)
+	if err != nil {
+		return err
 	}
 
 	zlog.Debug("set token prices",
@@ -138,8 +147,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 
 	s.Log.Debug("new token prices",
-		zap.Stringer("token0", token0.DerivedETH.Float()),
-		zap.Stringer("token1", token1.DerivedETH.Float()),
+		zap.String("value", token0.DerivedETH.Float().Text('g', -1)),
+		zap.String("value", token1.DerivedETH.Float().Text('g', -1)),
 	)
 
 	// get tracked liquidity - will be 0 if neither is in whitelist
