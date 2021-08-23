@@ -5762,6 +5762,40 @@ create table if not exists %%SCHEMA%%.cursor
 );
 alter table %%SCHEMA%%.cursor owner to graph;
 
+create table %%SCHEMA%%.poi2$
+(
+    digest      bytea     not null,
+    id          text      not null,
+    vid         bigserial not null
+        constraint poi2$_pkey
+            primary key,
+    block_range int4range not null,
+	_updated_block_number  numeric not null,
+    constraint poi2$_id_block_range_excl
+        exclude using gist (id with =, block_range with &&)
+);
+
+alter table %%SCHEMA%%.poi2$
+    owner to graph;
+
+create index brin_poi2$
+    on %%SCHEMA%%.poi2$ using brin (lower(block_range), COALESCE(upper(block_range), 2147483647), vid);
+
+CREATE INDEX poi2$_updated_block_number
+    ON %%SCHEMA%%.poi2$ USING btree
+	(_updated_block_number ASC NULLS LAST)
+	TABLESPACE pg_default;
+
+create index poi2$_block_range_closed
+    on %%SCHEMA%%.poi2$ (COALESCE(upper(block_range), 2147483647))
+    where (COALESCE(upper(block_range), 2147483647) < 2147483647);
+
+create index attr_12_0_poi2$_digest
+    on %%SCHEMA%%.poi2$ (digest);
+
+create index attr_12_1_poi2$_id
+    on %%SCHEMA%%.poi2$ ("left"(id, 256));
+
 create table if not exists %%SCHEMA%%.dynamic_data_source_xxx
 (
 	id text not null,
@@ -5982,9 +6016,9 @@ func (i *TestIntrinsics) StepAbove(step int) bool {
 	return i.step > step
 }
 
-func (i *TestIntrinsics) GetTokenInfo(address eth.Address, validate subgraph.TokenValidator) (*eth.Token, bool) {
+func (i *TestIntrinsics) GetTokenInfo(address eth.Address) *eth.Token {
 	tok := i.tokens[address.Pretty()]
-	return tok, validate(tok)
+	return tok
 }
 
 type TestCase struct {

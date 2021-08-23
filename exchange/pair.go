@@ -85,8 +85,8 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 		return nil, err
 	}
 
-	tm, valid := s.GetTokenInfo(tokenAddress, validateToken)
-	if !valid {
+	tm := s.GetTokenInfo(tokenAddress)
+	if !validateToken(tm) {
 		s.Log.Info("token is invalid",
 			zap.String("token", tokenAddress.Pretty()),
 			zap.Uint64("block_number", s.Block().Number()),
