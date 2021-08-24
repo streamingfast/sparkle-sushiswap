@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"fmt"
+	"math/big"
 
 	"github.com/streamingfast/eth-go"
 	"github.com/streamingfast/sparkle/entity"
@@ -92,7 +93,11 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 			zap.Uint64("block_number", s.Block().Number()),
 			zap.String("block_id", s.Block().ID()),
 		)
-		return nil, nil
+
+		tm.Symbol = "unknown"
+		tm.Name = "unknown"
+		tm.TotalSupply = big.NewInt(0)
+		tm.Decimals = 0
 	}
 
 	token.Factory = factory.ID
