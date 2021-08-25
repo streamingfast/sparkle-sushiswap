@@ -2,12 +2,11 @@ package exchange
 
 import (
 	"fmt"
+	"github.com/streamingfast/sparkle/subgraph"
 	"math/big"
 
 	"github.com/streamingfast/eth-go"
 	"github.com/streamingfast/sparkle/entity"
-
-	"go.uber.org/zap"
 )
 
 func (s *Subgraph) getPair(pairAddress, token0Address, token1Address eth.Address) (*Pair, error) {
@@ -86,25 +85,55 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 		return nil, err
 	}
 
-	tm := s.GetTokenInfo(tokenAddress)
-	if !validateToken(tm) {
-		s.Log.Info("token is invalid",
-			zap.String("token", tokenAddress.Pretty()),
-			zap.Uint64("block_number", s.Block().Number()),
-			zap.String("block_id", s.Block().ID()),
-		)
+	calls := []*subgraph.RPCCall{
+		{
+			ToAddr:          tokenAddress.Pretty(),
+			MethodSignature: "decimals() (uint256)",
+		},
+		{
+			ToAddr:          tokenAddress.Pretty(),
+			MethodSignature: "name() (string)",
+		},
+		{
+			ToAddr:          tokenAddress.Pretty(),
+			MethodSignature: "symbol() (string)",
+		},
+		{
+			ToAddr:          tokenAddress.Pretty(),
+			MethodSignature: "totalSupply() (uint256)",
+		},
+	}
 
-		tm.Symbol = "unknown"
-		tm.Name = "unknown"
-		tm.TotalSupply = big.NewInt(0)
-		tm.Decimals = 0
+	resps, err := s.RPC(calls)
+	if err != nil {
+		return nil, fmt.Errorf("rpc call error: %w", err)
+	}
+
+	decimalsResponse := resps[0]
+	if decimalsResponse.CallError == nil && decimalsResponse.DecodingError == nil {
+		token.Decimals = IL(decimalsResponse.Decoded[0].(*big.Int).Int64())
+	}
+
+	nameResponse := resps[1]
+	if nameResponse.CallError == nil && nameResponse.DecodingError == nil {
+		token.Name = nameResponse.Decoded[0].(string)
+	} else {
+		token.Name = "unknown"
+	}
+
+	symbolResponse := resps[2]
+	if symbolResponse.CallError == nil && symbolResponse.DecodingError == nil {
+		token.Symbol = symbolResponse.Decoded[0].(string)
+	} else {
+		token.Symbol = "unknown"
+	}
+
+	totalSupplyResponse := resps[3]
+	if totalSupplyResponse.CallError == nil && totalSupplyResponse.DecodingError == nil {
+		token.TotalSupply = IL(totalSupplyResponse.Decoded[0].(*big.Int).Int64())
 	}
 
 	token.Factory = factory.ID
-	//token.TotalSupply = I(tm.TotalSupply) // TODO(sf): fix this value.
-	token.Name = tm.Name
-	token.Symbol = tm.Symbol
-	token.Decimals = IL(int64(tm.Decimals))
 	token.DerivedETH = FL(0)
 	token.WhitelistPairs = []string{}
 
@@ -113,8 +142,4 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 	}
 
 	return token, nil
-}
-
-func validateToken(tok *eth.Token) bool {
-	return !tok.IsEmptyDecimal
 }
