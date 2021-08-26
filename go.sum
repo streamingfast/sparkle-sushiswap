@@ -899,6 +899,8 @@ github.com/streamingfast/sparkle v0.0.0-20210825195135-05ea43ce9e54 h1:2Uv5KbFoM
 github.com/streamingfast/sparkle v0.0.0-20210825195135-05ea43ce9e54/go.mod h1:cyC1nvrJ4vRQ3Ap8vwDwKpgbog1tJHUxMBmNlenTavE=
 github.com/streamingfast/sparkle v0.0.0-20210826151602-4aff8bf63bb5 h1:MjW8e8Vek2RVrZ/mbRFuls/ATq76/cjXzosrzChoZl4=
 github.com/streamingfast/sparkle v0.0.0-20210826151602-4aff8bf63bb5/go.mod h1:cyC1nvrJ4vRQ3Ap8vwDwKpgbog1tJHUxMBmNlenTavE=
+github.com/streamingfast/sparkle v0.0.0-20210826201652-f69f73d7e333 h1:JTwUgi67+1IPicoccYVAjuSE2YAdC2zRXR3OPRRV6rI=
+github.com/streamingfast/sparkle v0.0.0-20210826201652-f69f73d7e333/go.mod h1:cyC1nvrJ4vRQ3Ap8vwDwKpgbog1tJHUxMBmNlenTavE=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0 h1:Hbg2NidpLE8veEBkEZTL3CvlkUIVzuU9jDplZO54c48=
