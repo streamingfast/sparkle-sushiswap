@@ -149,7 +149,7 @@ func (s *Subgraph) GetEthPriceInUSD() (*big.Float, error) {
 		}
 
 		var usdcWeight *big.Float
-		if !isDaiFirst {
+		if !isUsdcFirst {
 			usdcWeight = bf().Quo(usdcPair.Reserve0.Float(), totalLiquidityEth).SetPrec(100)
 		} else {
 			usdcWeight = bf().Quo(usdcPair.Reserve1.Float(), totalLiquidityEth).SetPrec(100)
