@@ -266,20 +266,28 @@ func getTrackedVolumeUSD(bundle *Bundle, tokenAmount0 *big.Float, token0 *Token,
 	count := pair.LiquidityProviderCount.Int()
 	if count.Cmp(big.NewInt(5)) < 0 {
 		reserve0USD := bf().Mul(pair.Reserve0.Float(), price0)
+		zlog.Debug("reserve 0 usd", zap.String("pair_reserve_0", pair.Reserve0.Float().Text('g', -1)), zap.String("price 0", price0.Text('g', -1)), zap.String("value", reserve0USD.Text('g', -1)))
 		reserve1USD := bf().Mul(pair.Reserve1.Float(), price0)
+		zlog.Debug("reserve 0 usd", zap.String("pair_reserve_0", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price0.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
 
 		if token0Whitelisted && token1Whitelisted {
-			if bf().Add(reserve0USD, reserve1USD).Cmp(MinimumUSDThresholdNewPairs) < 0 {
+			totalReserve := bf().Add(reserve0USD, reserve1USD)
+			zlog.Debug("total pair reserve", zap.String("value", totalReserve.Text('g', -1)))
+
+			if totalReserve.Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under MinimumUSDThresholdNewPairs threshold. returning 0")
 				return big.NewFloat(0)
 			}
 		}
 		if token0Whitelisted && !token1Whitelisted {
 			if bf().Mul(reserve0USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under MinimumUSDThresholdNewPairs threshold. returning 0")
 				return big.NewFloat(0)
 			}
 		}
 		if !token0Whitelisted && token1Whitelisted {
 			if bf().Mul(reserve1USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under MinimumUSDThresholdNewPairs threshold. returning 0")
 				return big.NewFloat(0)
 			}
 		}

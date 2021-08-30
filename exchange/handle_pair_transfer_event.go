@@ -248,7 +248,6 @@ func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
 		}
 	}
 
-	// TODO (SF): why are we saving this again?
 	if err := s.Save(trx); err != nil {
 		return err
 	}

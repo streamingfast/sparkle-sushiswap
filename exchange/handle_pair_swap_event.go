@@ -111,6 +111,10 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	}
 
 	// save entities
+	if err := s.Save(pair); err != nil {
+		return fmt.Errorf("saving pair: %w", err)
+	}
+
 	if err := s.Save(token0); err != nil {
 		return fmt.Errorf("saving initialToken 0: %w", err)
 	}

@@ -125,21 +125,19 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	if err != nil {
 		return err
 	}
-
 	zlog.Debug("calculated derived ETH price for token0", zap.String("value", t0DerivedETH.Text('g', -1)))
-
-	token0.DerivedETH = F(t0DerivedETH)
-	if err := s.Save(token0); err != nil {
-		return err
-	}
 
 	s.Log.Debug("calculating t1 derived price", zap.String("token1", token1.ID))
 	t1DerivedETH, err := s.FindEthPerToken(token1)
 	if err != nil {
 		return err
 	}
-
 	zlog.Debug("calculated derived ETH price for token1", zap.String("value", t1DerivedETH.Text('g', -1)))
+
+	token0.DerivedETH = F(t0DerivedETH)
+	if err := s.Save(token0); err != nil {
+		return err
+	}
 
 	token1.DerivedETH = F(t1DerivedETH)
 	if err := s.Save(token1); err != nil {
