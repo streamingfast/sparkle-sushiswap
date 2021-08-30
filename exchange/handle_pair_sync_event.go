@@ -43,13 +43,6 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
-	s.Log.Debug("handler sync pre dump",
-		zap.Reflect("token0", token0),
-		zap.Reflect("token1", token1),
-		zap.Reflect("factory", factory),
-		zap.Reflect("pair", pair),
-	)
-
 	// reset factory liquidity by subtracting only tracked liquidity
 	factory.LiquidityETH = F(bf().Sub(
 		factory.LiquidityETH.Float(),
@@ -61,8 +54,13 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	token0.Liquidity = F(bf().Sub(token0.Liquidity.Float(), pair.Reserve0.Float()))
 	token1.Liquidity = F(bf().Sub(token1.Liquidity.Float(), pair.Reserve1.Float()))
 
+	pairReserve0Before := pair.Reserve0
+	pairReserve1Before := pair.Reserve1
 	pair.Reserve0 = F(entity.ConvertTokenToDecimal(ev.Reserve0, token0.Decimals.Int().Int64()))
 	pair.Reserve1 = F(entity.ConvertTokenToDecimal(ev.Reserve1, token1.Decimals.Int().Int64()))
+
+	zlog.Debug("**********UPDATED PAIR 0 RESERVE**********", zap.String("from", pairReserve0Before.Float().Text('g', -1)), zap.String("to", pair.Reserve0.Float().Text('g', -1)))
+	zlog.Debug("**********UPDATED PAIR 1 RESERVE**********", zap.String("from", pairReserve1Before.Float().Text('g', -1)), zap.String("to", pair.Reserve1.Float().Text('g', -1)))
 
 	zlog.Debug("pair token0 price before", zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 	if pair.Reserve1.Float().Cmp(bf()) != 0 {
@@ -135,11 +133,12 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	zlog.Debug("calculated derived ETH price for token1", zap.String("value", t1DerivedETH.Text('g', -1)))
 
 	token0.DerivedETH = F(t0DerivedETH)
+	token1.DerivedETH = F(t1DerivedETH)
+
 	if err := s.Save(token0); err != nil {
 		return err
 	}
 
-	token1.DerivedETH = F(t1DerivedETH)
 	if err := s.Save(token1); err != nil {
 		return err
 	}

@@ -258,6 +258,7 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 func getTrackedVolumeUSD(bundle *Bundle, tokenAmount0 *big.Float, token0 *Token, tokenAmount1 *big.Float, token1 *Token, pair *Pair) *big.Float {
 	price0 := bf().Mul(token0.DerivedETH.Float(), bundle.EthPrice.Float())
 	price1 := bf().Mul(token1.DerivedETH.Float(), bundle.EthPrice.Float())
+	zlog.Debug("bundle", zap.String("EthPrice", bundle.EthPrice.Float().Text('g', -1)))
 
 	token0Whitelisted := isWhitelistedAddress(token0.ID)
 	token1Whitelisted := isWhitelistedAddress(token1.ID)
@@ -267,8 +268,8 @@ func getTrackedVolumeUSD(bundle *Bundle, tokenAmount0 *big.Float, token0 *Token,
 	if count.Cmp(big.NewInt(5)) < 0 {
 		reserve0USD := bf().Mul(pair.Reserve0.Float(), price0)
 		zlog.Debug("reserve 0 usd", zap.String("pair_reserve_0", pair.Reserve0.Float().Text('g', -1)), zap.String("price 0", price0.Text('g', -1)), zap.String("value", reserve0USD.Text('g', -1)))
-		reserve1USD := bf().Mul(pair.Reserve1.Float(), price0)
-		zlog.Debug("reserve 0 usd", zap.String("pair_reserve_0", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price0.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
+		reserve1USD := bf().Mul(pair.Reserve1.Float(), price1)
+		zlog.Debug("reserve 1 usd", zap.String("pair_reserve_1", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price0.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
 
 		if token0Whitelisted && token1Whitelisted {
 			totalReserve := bf().Add(reserve0USD, reserve1USD)

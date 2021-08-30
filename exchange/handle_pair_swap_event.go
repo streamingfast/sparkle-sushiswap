@@ -76,7 +76,7 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	// update token1 global volume and initialToken liquidity stats
 	token1.Volume = entity.FloatAdd(token1.Volume, F(bf().Add(amount1In, amount1Out)))
 	token1.VolumeUSD = entity.FloatAdd(token1.VolumeUSD, F(trackedAmountUSD))
-	token1.UntrackedVolumeUSD = entity.FloatAdd(token0.UntrackedVolumeUSD, F(derivedAmountUSD))
+	token1.UntrackedVolumeUSD = entity.FloatAdd(token1.UntrackedVolumeUSD, F(derivedAmountUSD))
 
 	// update txn counts
 	token0.TxCount = entity.IntAdd(token0.TxCount, IL(1))
