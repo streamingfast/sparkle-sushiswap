@@ -3,6 +3,7 @@ set -x;
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 STOREURL=gs://dfuseio-global-blocks-us/eth-mainnet/v5
+RPCENDPOINT="https://bitter-withered-forest.quiknode.pro/750d6d73a803c919af639034b82ef675975cb2ba/"
 if test -d ../localblocks; then
   echo "Using blocks from local store: ./localblocks"
     STOREURL=./localblocks
@@ -24,16 +25,16 @@ EOC
 fi
 
 function step1() {
-    INFO=.* exchange parallel step -s 1 --output-path ./step1-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL &
+    INFO=.* exchange parallel step -s 1 --output-path ./step1-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
 function step2() {
-    INFO=.* exchange parallel step -s 2 --input-path ./step1-v1 --output-path ./step2-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL &
+    INFO=.* exchange parallel step -s 2 --input-path ./step1-v1 --output-path ./step2-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
 function step3() {
-    INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL &
+    INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
 function step4() {
-    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL  &
+    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
 
 
@@ -103,12 +104,6 @@ main() {
       step4 10804229 10814228
       step4 10814229 10824228
       step4 10824229 10834228
-#      step4 10834229 10844228
-#      step4 10844229 10854228
-#      step4 10854229 10864228
-#      step4 10864229 10874228
-#      step4 10874229 10884228
-#      step4 10884229 10894228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
