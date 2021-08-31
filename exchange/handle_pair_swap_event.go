@@ -90,24 +90,23 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	pair.VolumeToken0 = entity.FloatAdd(pair.VolumeToken0, F(amount0Total))
 	pair.VolumeToken1 = entity.FloatAdd(pair.VolumeToken1, F(amount1Total))
 	pair.UntrackedVolumeUSD = entity.FloatAdd(pair.UntrackedVolumeUSD, F(derivedAmountUSD))
-
 	pair.TxCount = entity.IntAdd(pair.TxCount, IL(1))
 	if err := s.Save(pair); err != nil {
 		return fmt.Errorf("saving pair: %w", err)
 	}
 
 	// update global values, only used tracked amounts for volume
-	factory := NewFactory(FactoryAddress)
-	err = s.Load(factory)
-	if err != nil {
-		return fmt.Errorf("loading factory: %w", err)
-	}
-
 	if !isBlacklistedAddress(token0.ID) && !isBlacklistedAddress(token1.ID) {
+		factory, err := s.getFactory()
+		if err != nil {
+			return fmt.Errorf("loading factory: %w", err)
+		}
+
 		factory.VolumeUSD = entity.FloatAdd(factory.VolumeUSD, F(trackedAmountUSD))
 		factory.VolumeETH = entity.FloatAdd(factory.VolumeETH, F(trackedAmountETH))
 		factory.UntrackedVolumeUSD = entity.FloatAdd(factory.UntrackedVolumeUSD, F(derivedAmountUSD))
 		factory.TxCount = entity.IntAdd(factory.TxCount, IL(1))
+
 		if err := s.Save(factory); err != nil {
 			return fmt.Errorf("saving factory: %w", err)
 		}
@@ -185,12 +184,12 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return fmt.Errorf("update day data: %w", err)
 	}
 
-	token0DayData, err := s.UpdateTokenDayData(ev.LogAddress, token0, bundle)
+	token0DayData, err := s.UpdateTokenDayData(token0)
 	if err != nil {
 		return fmt.Errorf("update token0 day data: %w", err)
 	}
 
-	token1DayData, err := s.UpdateTokenDayData(ev.LogAddress, token1, bundle)
+	token1DayData, err := s.UpdateTokenDayData(token1)
 	if err != nil {
 		return fmt.Errorf("udpate token1 day data: %w", err)
 	}

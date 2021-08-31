@@ -120,14 +120,19 @@ func (s *Subgraph) UpdatePairHourData(pairAddress eth.Address) (*PairHourData, e
 	return pairHourData, nil
 }
 
-func (s *Subgraph) UpdateTokenDayData(pairAddress eth.Address, token *Token, bundle *Bundle) (*TokenDayData, error) {
+func (s *Subgraph) UpdateTokenDayData(token *Token) (*TokenDayData, error) {
+	bundle, err := s.getBundle()
+	if err != nil {
+		return nil, err
+	}
+
 	timestamp := s.Block().Timestamp().Unix()
 	dayId := timestamp / 86400
 	dayStartTimestamp := dayId * 86400
 	tokenDayId := fmt.Sprintf("%s-%d", token.ID, dayId)
 
 	tokenDayData := NewTokenDayData(tokenDayId)
-	err := s.Load(tokenDayData)
+	err = s.Load(tokenDayData)
 	if err != nil {
 		return nil, fmt.Errorf("loading token_day_data")
 	}

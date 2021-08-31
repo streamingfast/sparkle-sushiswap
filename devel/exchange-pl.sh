@@ -48,11 +48,13 @@ main() {
       echo "LAUNCHING STEP 1"
       rm -rf ./step1-v1
 
-
       step1 10794229 10804228
       step1 10804229 10814228
       step1 10814229 10824228
-      step1 10824229 10829546
+      step1 10824229 10834228
+      step1 10834229 10844228
+      step1 10844229 10854228
+      step1 10854229 10864228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -69,7 +71,10 @@ main() {
       step2 10794229 10804228
       step2 10804229 10814228
       step2 10814229 10824228
-      step2 10824229 10829546
+      step2 10824229 10834228
+      step2 10834229 10844228
+      step2 10844229 10854228
+      step2 10854229 10864228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -86,7 +91,10 @@ main() {
       step3 10794229 10804228
       step3 10804229 10814228
       step3 10814229 10824228
-      step3 10824229 10829546
+      step3 10824229 10834228
+      step3 10834229 10844228
+      step3 10844229 10854228
+      step3 10854229 10864228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
@@ -103,7 +111,10 @@ main() {
       step4 10794229 10804228
       step4 10804229 10814228
       step4 10814229 10824228
-      step4 10824229 10829546
+      step4 10824229 10834228
+      step4 10834229 10844228
+      step4 10844229 10854228
+      step4 10854229 10864228
 
       for job in `jobs -p`; do
           echo "Waiting on $job"
