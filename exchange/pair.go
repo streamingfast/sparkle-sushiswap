@@ -3,6 +3,7 @@ package exchange
 import (
 	"fmt"
 	"github.com/streamingfast/sparkle/subgraph"
+	"go.uber.org/zap"
 	"math/big"
 
 	"github.com/streamingfast/eth-go"
@@ -142,4 +143,113 @@ func (s *Subgraph) getToken(tokenAddress eth.Address) (*Token, error) {
 	}
 
 	return token, nil
+}
+
+func (s *Subgraph) getTrackedVolumeUSD(tokenAmount0 *big.Float, token0 *Token, tokenAmount1 *big.Float, token1 *Token, pair *Pair) (*big.Float, error) {
+	bundle, err := s.getBundle()
+	if err != nil {
+		return nil, err
+	}
+
+	price0 := bf().Mul(token0.DerivedETH.Float(), bundle.EthPrice.Float())
+	price1 := bf().Mul(token1.DerivedETH.Float(), bundle.EthPrice.Float())
+	zlog.Debug("bundle", zap.String("EthPrice", bundle.EthPrice.Float().Text('g', -1)))
+
+	token0Whitelisted := isWhitelistedAddress(token0.ID)
+	token1Whitelisted := isWhitelistedAddress(token1.ID)
+
+	// if less than 5 LPs, require high minimum reserve amount amount or return 0
+	count := pair.LiquidityProviderCount.Int()
+	if count.Cmp(big.NewInt(5)) < 0 {
+		reserve0USD := bf().Mul(pair.Reserve0.Float(), price0)
+		zlog.Debug("reserve 0 usd", zap.String("pair_reserve_0", pair.Reserve0.Float().Text('g', -1)), zap.String("price 0", price0.Text('g', -1)), zap.String("value", reserve0USD.Text('g', -1)))
+		reserve1USD := bf().Mul(pair.Reserve1.Float(), price1)
+		zlog.Debug("reserve 1 usd", zap.String("pair_reserve_1", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price1.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
+
+		if token0Whitelisted && token1Whitelisted {
+			totalReserve := bf().Add(reserve0USD, reserve1USD)
+			zlog.Debug("total pair reserve", zap.String("value", totalReserve.Text('g', -1)))
+
+			if totalReserve.Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under minimum threshold. returning 0")
+				return big.NewFloat(0), nil
+			}
+		}
+		if token0Whitelisted && !token1Whitelisted {
+			if bf().Mul(reserve0USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under minimum threshold. returning 0")
+				return big.NewFloat(0), nil
+			}
+		}
+		if !token0Whitelisted && token1Whitelisted {
+			if bf().Mul(reserve1USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
+				zlog.Debug("under minimum threshold. returning 0")
+				return big.NewFloat(0), nil
+			}
+		}
+	}
+
+	// both are whitelist tokens, take average of both amounts
+	if token0Whitelisted && token1Whitelisted {
+		sum := bf().Add(
+			bf().Mul(tokenAmount0, price0),
+			bf().Mul(tokenAmount1, price1),
+		)
+		avg := bf().Quo(sum, big.NewFloat(2.0))
+		return avg, nil
+	}
+
+	if token0Whitelisted && !token1Whitelisted {
+		// take full value of the whitelisted token amount
+		return bf().Mul(tokenAmount0, price0), nil
+	}
+
+	if !token0Whitelisted && token1Whitelisted {
+		// take full value of the whitelisted token amount
+		return bf().Mul(tokenAmount1, price1), nil
+	}
+
+	// neither token is on white list, tracked volume is 0
+	return big.NewFloat(0), nil
+}
+
+func (s *Subgraph) getTrackedLiquidityUSD(tokenAmount0 *big.Float, token0 *Token, tokenAmount1 *big.Float, token1 *Token) (*big.Float, error) {
+	bundle, err := s.getBundle()
+	if err != nil {
+		return nil, err
+	}
+
+	price0 := bf().Mul(token0.DerivedETH.Float().SetPrec(100), bundle.EthPrice.Float().SetPrec(100)).SetPrec(100)
+	price1 := bf().Mul(token1.DerivedETH.Float().SetPrec(100), bundle.EthPrice.Float().SetPrec(100)).SetPrec(100)
+
+	token0Whitelisted := isWhitelistedAddress(token0.ID)
+	token1Whitelisted := isWhitelistedAddress(token1.ID)
+
+	// both are whitelist tokens, take average of both amounts
+	if token0Whitelisted && token1Whitelisted {
+		return bf().Add(
+			bf().Mul(tokenAmount0, price0).SetPrec(100),
+			bf().Mul(tokenAmount1, price1).SetPrec(100),
+		).SetPrec(100), nil
+	}
+
+	floatTwo := big.NewFloat(2)
+	if token0Whitelisted && !token1Whitelisted {
+		// take double value of the whitelisted token amount
+		return bf().Mul(
+			bf().Mul(tokenAmount0, price0).SetPrec(100),
+			floatTwo,
+		).SetPrec(100), nil
+	}
+
+	if !token0Whitelisted && token1Whitelisted {
+		// take double value of the whitelisted token amount
+		return bf().Mul(
+			bf().Mul(tokenAmount1, price1).SetPrec(100),
+			floatTwo,
+		).SetPrec(100), nil
+	}
+
+	// neither token is on white list, tracked volume is 0
+	return big.NewFloat(0), nil
 }

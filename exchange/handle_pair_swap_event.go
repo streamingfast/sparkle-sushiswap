@@ -55,7 +55,10 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	derivedAmountUSD := bf().Mul(derivedAmountETH, bundle.EthPrice.Float())
 
 	// only accounts for volume through white listed tokens
-	trackedAmountUSD := getTrackedVolumeUSD(bundle, amount0Total, token0, amount1Total, token1, pair)
+	trackedAmountUSD, err := s.getTrackedVolumeUSD(amount0Total, token0, amount1Total, token1, pair)
+	if err != nil {
+		return err
+	}
 
 	var trackedAmountETH *big.Float
 	if bundle.EthPrice.Float().Cmp(big.NewFloat(0)) == 0 {

@@ -59,8 +59,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	pair.Reserve0 = F(entity.ConvertTokenToDecimal(ev.Reserve0, token0.Decimals.Int().Int64()))
 	pair.Reserve1 = F(entity.ConvertTokenToDecimal(ev.Reserve1, token1.Decimals.Int().Int64()))
 
-	zlog.Debug("**********UPDATED PAIR 0 RESERVE**********", zap.String("from", pairReserve0Before.Float().Text('g', -1)), zap.String("to", pair.Reserve0.Float().Text('g', -1)))
-	zlog.Debug("**********UPDATED PAIR 1 RESERVE**********", zap.String("from", pairReserve1Before.Float().Text('g', -1)), zap.String("to", pair.Reserve1.Float().Text('g', -1)))
+	zlog.Debug("updated pair 0 reserve", zap.String("from", pairReserve0Before.Float().Text('g', -1)), zap.String("to", pair.Reserve0.Float().Text('g', -1)))
+	zlog.Debug("updated pair 1 reserve", zap.String("from", pairReserve1Before.Float().Text('g', -1)), zap.String("to", pair.Reserve1.Float().Text('g', -1)))
 
 	zlog.Debug("pair token0 price before", zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 	if pair.Reserve1.Float().Cmp(bf()) != 0 {
@@ -150,8 +150,11 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 
 	// get tracked liquidity - will be 0 if neither is in whitelist
 	trackedLiquidityETH := big.NewFloat(0)
-	if ethPrice.Cmp(bf()) != 0 {
-		tr := getTrackedLiquidityUSD(bundle, pair.Reserve0.Float(), token0, pair.Reserve1.Float(), token1)
+	if bundle.EthPrice.Float().Cmp(bf()) != 0 {
+		tr, err := s.getTrackedLiquidityUSD(pair.Reserve0.Float(), token0, pair.Reserve1.Float(), token1)
+		if err != nil {
+			return err
+		}
 		trackedLiquidityETH = bf().Quo(
 			tr,
 			ethPrice,
