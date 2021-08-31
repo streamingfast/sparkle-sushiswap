@@ -4,7 +4,9 @@
 
 # Usage
 
-See https://github.com/streamingfast/sparkle-pancakeswap for instructions and details.
+This repository works the same as https://github.com/streamingfast/sparkle-pancakeswap
+
+Please refer to that repository for help and inspiration to get this one running.
 
 
 ## License
