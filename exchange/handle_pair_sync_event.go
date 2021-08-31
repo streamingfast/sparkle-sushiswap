@@ -25,14 +25,14 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 
 	token0, err := s.getToken(eth.MustNewAddress(pair.Token0))
-	if err := s.Load(token0); err != nil {
+	if err != nil {
 		return fmt.Errorf("loading token 0: %s of pair: %s:%w", pair.Token0, ev.LogAddress.Pretty(), err)
 	}
 
 	s.Log.Debug("current derived eth token 0", zap.Stringer("value", token0.DerivedETH))
 
 	token1, err := s.getToken(eth.MustNewAddress(pair.Token1))
-	if err := s.Load(token1); err != nil {
+	if err != nil {
 		return fmt.Errorf("loading token 1: %s of pair: %s :%w", pair.Token1, ev.LogAddress.Pretty(), err)
 	}
 
