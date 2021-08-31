@@ -399,7 +399,7 @@ type Pair @entity {
   reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal! @sql(index: false)
+  trackedReserveETH: BigDecimal! @parallel(step: 2) @sql(index: false)
 
   # Price in terms of the asset pair
   token0Price: BigDecimal! @parallel(step: 2)
@@ -3033,6 +3033,7 @@ func (next *Pair) Merge(step int, cached *Pair) {
 		if next.MutatedOnStep != 2 {
 			next.Reserve0 = cached.Reserve0
 			next.Reserve1 = cached.Reserve1
+			next.TrackedReserveETH = cached.TrackedReserveETH
 			next.Token0Price = cached.Token0Price
 			next.Token1Price = cached.Token1Price
 		}

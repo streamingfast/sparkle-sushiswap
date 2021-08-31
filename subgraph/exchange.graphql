@@ -257,7 +257,7 @@ type Pair @entity {
   reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal! @sql(index: false)
+  trackedReserveETH: BigDecimal! @parallel(step: 2) @sql(index: false)
 
   # Price in terms of the asset pair
   token0Price: BigDecimal! @parallel(step: 2)
