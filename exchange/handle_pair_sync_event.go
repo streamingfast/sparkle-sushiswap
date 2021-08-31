@@ -83,6 +83,10 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
+	if s.StepBelow(3) {
+		return nil
+	}
+
 	zlog.Debug("set token prices",
 		zap.Stringer("pair.token_0_price", pair.Token0Price),
 		zap.Stringer("pair.token_1_price", pair.Token1Price),
@@ -94,16 +98,6 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	ethPrice, err := s.GetEthPriceInUSD()
 	if err != nil {
 		return err
-	}
-
-	if s.StepBelow(3) {
-		// In parralel reproc, we are ending here if step is below 3, as such, we need to save the pair right away
-		s.Log.Debug("updated pair", zap.Reflect("pair", pair))
-		if err := s.Save(pair); err != nil {
-			return err
-		}
-
-		return nil
 	}
 
 	bundle, err := s.getBundle() // creates bundle if it does not exist
@@ -190,7 +184,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 
 	pair.ReserveUSD = F(bf().Mul(
 		pair.ReserveETH.Float(),
-		ethPrice,
+		bundle.EthPrice.Float(),
 	))
 
 	// use tracked amounts globally
