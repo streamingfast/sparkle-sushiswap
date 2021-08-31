@@ -112,10 +112,10 @@ func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
 		return err
 	}
 
-	if _, err := s.UpdateTokenDayData(ev.LogAddress, token0, bundle); err != nil {
+	if _, err := s.UpdateTokenDayData(token0); err != nil {
 		return err
 	}
-	if _, err := s.UpdateTokenDayData(ev.LogAddress, token1, bundle); err != nil {
+	if _, err := s.UpdateTokenDayData(token1); err != nil {
 		return err
 	}
 
