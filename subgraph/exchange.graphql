@@ -154,7 +154,7 @@ type Token @entity {
   # liquidity across all pairs
   liquidity: BigDecimal!  @parallel(step: 3, type: SUM)
 
-  derivedETH: BigDecimal! @parallel(step: 2)
+  derivedETH: BigDecimal! @parallel(step: 3)
 
   whitelistPairs: [Pair!]! @parallel(step: 3)
 
@@ -248,8 +248,8 @@ type Pair @entity {
   token0: Token! @parallel(step: 1)
   token1: Token! @parallel(step: 1)
 
-  reserve0: BigDecimal! @parallel(step: 2)
-  reserve1: BigDecimal! @parallel(step: 2)
+  reserve0: BigDecimal! @parallel(step: 3)
+  reserve1: BigDecimal! @parallel(step: 3)
   totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
 
   # derived liquidity
@@ -257,11 +257,11 @@ type Pair @entity {
   reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal! @parallel(step: 2) @sql(index: false)
+  trackedReserveETH: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # Price in terms of the asset pair
-  token0Price: BigDecimal! @parallel(step: 2)
-  token1Price: BigDecimal! @parallel(step: 2)
+  token0Price: BigDecimal! @parallel(step: 3)
+  token1Price: BigDecimal! @parallel(step: 3)
 
   # lifetime volume stats
   volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)

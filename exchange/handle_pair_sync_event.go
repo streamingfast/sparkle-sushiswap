@@ -28,14 +28,12 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	if err != nil {
 		return fmt.Errorf("loading token 0: %s of pair: %s:%w", pair.Token0, ev.LogAddress.Pretty(), err)
 	}
-
 	s.Log.Debug("current derived eth token 0", zap.Stringer("value", token0.DerivedETH))
 
 	token1, err := s.getToken(eth.MustNewAddress(pair.Token1))
 	if err != nil {
 		return fmt.Errorf("loading token 1: %s of pair: %s :%w", pair.Token1, ev.LogAddress.Pretty(), err)
 	}
-
 	s.Log.Debug("current derived eth token 1", zap.Stringer("value", token1.DerivedETH))
 
 	factory := NewFactory(FactoryAddress)
@@ -43,13 +41,13 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
+	s.Log.Debug("reserved ETH before removal", zap.String("value", factory.LiquidityETH.Float().Text('g', -1)))
 	// reset factory liquidity by subtracting only tracked liquidity
 	factory.LiquidityETH = F(bf().Sub(
 		factory.LiquidityETH.Float(),
 		pair.TrackedReserveETH.Float(),
 	))
-
-	s.Log.Debug("removed tracked reserved ETH", zap.Stringer("value", factory.LiquidityETH.Float()))
+	s.Log.Debug("reserved ETH after removal", zap.String("value", factory.LiquidityETH.Float().Text('g', -1)))
 
 	token0.Liquidity = F(bf().Sub(token0.Liquidity.Float(), pair.Reserve0.Float()))
 	token1.Liquidity = F(bf().Sub(token1.Liquidity.Float(), pair.Reserve1.Float()))
@@ -59,8 +57,14 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	pair.Reserve0 = F(entity.ConvertTokenToDecimal(ev.Reserve0, token0.Decimals.Int().Int64()))
 	pair.Reserve1 = F(entity.ConvertTokenToDecimal(ev.Reserve1, token1.Decimals.Int().Int64()))
 
-	zlog.Debug("updated pair 0 reserve", zap.String("from", pairReserve0Before.Float().Text('g', -1)), zap.String("to", pair.Reserve0.Float().Text('g', -1)))
-	zlog.Debug("updated pair 1 reserve", zap.String("from", pairReserve1Before.Float().Text('g', -1)), zap.String("to", pair.Reserve1.Float().Text('g', -1)))
+	zlog.Debug("updated pair 0 reserve",
+		zap.String("from", pairReserve0Before.Float().Text('g', -1)),
+		zap.String("to", pair.Reserve0.Float().Text('g', -1)),
+	)
+	zlog.Debug("updated pair 1 reserve",
+		zap.String("from", pairReserve1Before.Float().Text('g', -1)),
+		zap.String("to", pair.Reserve1.Float().Text('g', -1)),
+	)
 
 	zlog.Debug("pair token0 price before", zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 	if pair.Reserve1.Float().Cmp(bf()) != 0 {
@@ -78,13 +82,17 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 	zlog.Debug("pair token1 price after", zap.String("value", pair.Token1Price.Float().Text('g', -1)))
 
-	err = s.Save(pair)
+	// We need to compute the ETH price *before* we save the pair (code just below)
+	// the reason for this, is that we don't want the reserves that are set above to affect
+	// the calculation of the ETH price (this was taken from the typsecript code)
+	ethPrice, err := s.GetEthPriceInUSD()
 	if err != nil {
 		return err
 	}
 
-	if s.StepBelow(3) {
-		return nil
+	err = s.Save(pair)
+	if err != nil {
+		return err
 	}
 
 	zlog.Debug("set token prices",
@@ -92,12 +100,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		zap.Stringer("pair.token_1_price", pair.Token1Price),
 	)
 
-	// We need to compute the ETH price *before* we save the pair (code just below)
-	// the reason for this, is that we don't want the reserves that are set above to affect
-	// the calculation of the ETH price (this was taken from the typsecript code)
-	ethPrice, err := s.GetEthPriceInUSD()
-	if err != nil {
-		return err
+	if s.StepBelow(3) {
+		return nil
 	}
 
 	bundle, err := s.getBundle() // creates bundle if it does not exist
