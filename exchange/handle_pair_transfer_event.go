@@ -39,8 +39,8 @@ func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
 	}
 
 	// get pair and load contract
-	pair := NewPair(ev.LogAddress.Pretty())
-	if err := s.Load(pair); err != nil {
+	pair, err := s.getPair(ev.LogAddress, nil, nil)
+	if err != nil {
 		return fmt.Errorf("loading pair id %s: %w", ev.LogAddress.Pretty(), err)
 	}
 

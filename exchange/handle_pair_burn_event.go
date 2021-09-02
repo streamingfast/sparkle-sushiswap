@@ -15,8 +15,8 @@ func (s *Subgraph) HandlePairBurnEvent(ev *PairBurnEvent) error {
 		return err
 	}
 
-	pair := NewPair(ev.LogAddress.Pretty())
-	if err := s.Load(pair); err != nil {
+	pair, err := s.getPair(ev.LogAddress, nil, nil)
+	if err != nil {
 		return err
 	}
 

@@ -24,8 +24,8 @@ func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
 	s.Log.Debug("mint things - mint", zap.String("to", eth.Address(mint.To).Pretty()))
 
 	pairAddress := ev.LogAddress
-	pair := NewPair(pairAddress.Pretty())
-	if err := s.Load(pair); err != nil {
+	pair, err := s.getPair(pairAddress, nil, nil)
+	if err != nil {
 		return err
 	}
 
