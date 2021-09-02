@@ -82,6 +82,11 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 	zlog.Debug("pair token1 price after", zap.String("value", pair.Token1Price.Float().Text('g', -1)))
 
+	err = s.Save(pair)
+	if err != nil {
+		return err
+	}
+
 	// We need to compute the ETH price *before* we save the pair (code just below)
 	// the reason for this, is that we don't want the reserves that are set above to affect
 	// the calculation of the ETH price (this was taken from the typsecript code)
@@ -90,17 +95,11 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
-	err = s.Save(pair)
-	if err != nil {
-		return err
-	}
-
-	zlog.Debug("set token prices",
-		zap.Stringer("pair.token_0_price", pair.Token0Price),
-		zap.Stringer("pair.token_1_price", pair.Token1Price),
-	)
-
 	if s.StepBelow(3) {
+		err = s.Save(pair)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 
