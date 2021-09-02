@@ -296,7 +296,7 @@ type Token @entity {
   # liquidity across all pairs
   liquidity: BigDecimal!  @parallel(step: 3, type: SUM)
 
-  derivedETH: BigDecimal! @parallel(step: 3)
+  derivedETH: BigDecimal! @parallel(step: 2)
 
   whitelistPairs: [Pair!]! @parallel(step: 3)
 
@@ -390,8 +390,8 @@ type Pair @entity {
   token0: Token! @parallel(step: 1)
   token1: Token! @parallel(step: 1)
 
-  reserve0: BigDecimal! @parallel(step: 3)
-  reserve1: BigDecimal! @parallel(step: 3)
+  reserve0: BigDecimal! @parallel(step: 2)
+  reserve1: BigDecimal! @parallel(step: 2)
   totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
 
   # derived liquidity
@@ -399,11 +399,11 @@ type Pair @entity {
   reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal! @parallel(step: 3) @sql(index: false)
+  trackedReserveETH: BigDecimal! @sql(index: false)
 
   # Price in terms of the asset pair
-  token0Price: BigDecimal! @parallel(step: 3)
-  token1Price: BigDecimal! @parallel(step: 3)
+  token0Price: BigDecimal! @parallel(step: 2)
+  token1Price: BigDecimal! @parallel(step: 2)
 
   # lifetime volume stats
   volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
@@ -2853,6 +2853,11 @@ func (next *Token) Merge(step int, cached *Token) {
 			next.Decimals = cached.Decimals
 		}
 	}
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
+			next.DerivedETH = cached.DerivedETH
+		}
+	}
 	if step == 4 {
 		next.TotalSupply = entity.IntAdd(next.TotalSupply, cached.TotalSupply)
 		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
@@ -2861,7 +2866,6 @@ func (next *Token) Merge(step int, cached *Token) {
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.Liquidity = entity.FloatAdd(next.Liquidity, cached.Liquidity)
 		if next.MutatedOnStep != 3 {
-			next.DerivedETH = cached.DerivedETH
 			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
@@ -3025,6 +3029,14 @@ func (next *Pair) Merge(step int, cached *Pair) {
 			next.Block = cached.Block
 		}
 	}
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
+			next.Token0Price = cached.Token0Price
+			next.Token1Price = cached.Token1Price
+		}
+	}
 	if step == 4 {
 		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
 		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
@@ -3034,13 +3046,8 @@ func (next *Pair) Merge(step int, cached *Pair) {
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.LiquidityProviderCount = entity.IntAdd(next.LiquidityProviderCount, cached.LiquidityProviderCount)
 		if next.MutatedOnStep != 3 {
-			next.Reserve0 = cached.Reserve0
-			next.Reserve1 = cached.Reserve1
 			next.ReserveETH = cached.ReserveETH
 			next.ReserveUSD = cached.ReserveUSD
-			next.TrackedReserveETH = cached.TrackedReserveETH
-			next.Token0Price = cached.Token0Price
-			next.Token1Price = cached.Token1Price
 		}
 	}
 }
