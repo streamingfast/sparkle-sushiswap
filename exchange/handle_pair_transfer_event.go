@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
-	if s.StepBelow(3) {
+	if s.StepBelow(2) {
 		return nil
 	}
 

@@ -40,7 +40,7 @@ var (
 
 var Definition = &subgraph.Definition{
 	PackageName:         "exchange",
-	HighestParallelStep: 3,
+	HighestParallelStep: 2,
 	StartBlock:          10794229,
 	IncludeFilter:       "",
 	Entities: entity.NewRegistry(
@@ -173,7 +173,7 @@ type Bundle @entity {
   id: ID!
 
   # price of ETH usd
-  ethPrice: BigDecimal! @parallel(step: 3)
+  ethPrice: BigDecimal! @parallel(step: 2)
 }
 
 # Factory
@@ -185,28 +185,28 @@ type Factory @entity {
   pairCount: BigInt! @parallel(step: 1, type: SUM)
 
   # Volume USD
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
 
   # Volume ETH
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 2, type: SUM)
 
   # Untracked volume
-  untrackedVolumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  untrackedVolumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
 
   # Liquidity USD
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 2)
 
   # Liquidity ETH
-  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 2)
 
   # Transaction count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 
   # Token count
-  tokenCount: BigInt! @parallel(step: 3, type: SUM)
+  tokenCount: BigInt! @parallel(step: 2, type: SUM)
 
   # User count
-  userCount: BigInt! @parallel(step: 3, type: SUM)
+  userCount: BigInt! @parallel(step: 2, type: SUM)
 
   # Pairs
   pairs: [Pair!]! @derivedFrom(field: "factory")
@@ -227,22 +227,22 @@ type HourData @entity {
   id: ID!
 
   # date
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
-  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 2, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 2)
+  liquidityUSD: BigDecimal! @parallel(step: 2)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 }
 
 # Day Data
@@ -251,22 +251,22 @@ type DayData @entity {
   id: ID!
 
   # date
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
-  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 2, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 2)
+  liquidityUSD: BigDecimal! @parallel(step: 2)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 }
 
 # Token
@@ -283,22 +283,22 @@ type Token @entity {
   decimals: BigInt! @parallel(step: 1)
 
   # used for other stats like marketcap
-  totalSupply: BigInt!  @parallel(step: 3, type: SUM)
+  totalSupply: BigInt!  @parallel(step: 2, type: SUM)
 
   # token specific volume
-  volume: BigDecimal!  @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
-  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
+  volume: BigDecimal!  @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 2, type: SUM)
 
   # transactions across all pairs
-  txCount: BigInt!  @parallel(step: 3, type: SUM)
+  txCount: BigInt!  @parallel(step: 2, type: SUM)
 
   # liquidity across all pairs
-  liquidity: BigDecimal!  @parallel(step: 3, type: SUM)
+  liquidity: BigDecimal!  @parallel(step: 2, type: SUM)
 
   derivedETH: BigDecimal! @parallel(step: 2)
 
-  whitelistPairs: [Pair!]! @parallel(step: 3)
+  whitelistPairs: [Pair!]! @parallel(step: 2)
 
   # Token hour data
   hourData: [TokenHourData!]! @derivedFrom(field: "token")
@@ -325,26 +325,26 @@ type TokenHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # token
-  token: Token! @parallel(step: 3)
+  token: Token! @parallel(step: 2)
 
   # volume
-  volume: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volume: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal! @parallel(step: 3)
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 2)
+  liquidityETH: BigDecimal! @parallel(step: 2)
+  liquidityUSD: BigDecimal! @parallel(step: 2)
 
   # price usd
-  priceUSD: BigDecimal! @parallel(step: 3)
+  priceUSD: BigDecimal! @parallel(step: 2)
 }
 
 # Token day data
@@ -353,26 +353,26 @@ type TokenDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # token
-  token: Token! @parallel(step: 3)
+  token: Token! @parallel(step: 2)
 
   # volume
-  volume: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volume: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal! @parallel(step: 3)
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 2)
+  liquidityETH: BigDecimal! @parallel(step: 2)
+  liquidityUSD: BigDecimal! @parallel(step: 2)
 
   # price usd
-  priceUSD: BigDecimal! @parallel(step: 3)
+  priceUSD: BigDecimal! @parallel(step: 2)
 }
 
 # Pair
@@ -392,29 +392,29 @@ type Pair @entity {
 
   reserve0: BigDecimal! @parallel(step: 2)
   reserve1: BigDecimal! @parallel(step: 2)
-  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
+  totalSupply: BigDecimal! @parallel(step: 2, type: SUM)
 
   # derived liquidity
-  reserveETH: BigDecimal! @parallel(step: 3)
-  reserveUSD: BigDecimal! @parallel(step: 3) @sql(index: false)
+  reserveETH: BigDecimal! @parallel(step: 2)
+  reserveUSD: BigDecimal! @parallel(step: 2) @sql(index: false)
 
   # used for separating per pair reserves and global
-  trackedReserveETH: BigDecimal! @sql(index: false)
+  trackedReserveETH: BigDecimal! @parallel(step: 2) @sql(index: false)
 
   # Price in terms of the asset pair
   token0Price: BigDecimal! @parallel(step: 2)
   token1Price: BigDecimal! @parallel(step: 2)
 
   # lifetime volume stats
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
-  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
-  txCount: BigInt!  @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 2, type: SUM)
+  txCount: BigInt!  @parallel(step: 2, type: SUM)
 
   # Fields used to help derived relationship
   # used to detect new exchanges
-  liquidityProviderCount: BigInt! @parallel(step: 3, type: SUM)
+  liquidityProviderCount: BigInt! @parallel(step: 2, type: SUM)
 
   # lca: BigDecimal!
   # lcad: BigDecimal!
@@ -447,27 +447,27 @@ type PairHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # pair
-  pair: Pair! @parallel(step: 3)
+  pair: Pair! @parallel(step: 2)
 
   # reserves
-  reserve0: BigDecimal! @parallel(step: 3)
-  reserve1: BigDecimal! @parallel(step: 3)
+  reserve0: BigDecimal! @parallel(step: 2)
+  reserve1: BigDecimal! @parallel(step: 2)
 
   # derived liquidity
   reserveUSD: BigDecimal!
 
   # volume
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 2, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 2, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 }
 
 # Pair day data
@@ -476,73 +476,73 @@ type PairDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 2)
 
   # pair
-  pair: Pair! @parallel(step: 3)
+  pair: Pair! @parallel(step: 2)
 
   # token0
-  token0: Token! @parallel(step: 3)
+  token0: Token! @parallel(step: 2)
 
   # token1
-  token1: Token! @parallel(step: 3)
+  token1: Token! @parallel(step: 2)
 
   # reserves
-  reserve0: BigDecimal! @parallel(step: 3)
-  reserve1: BigDecimal! @parallel(step: 3)
+  reserve0: BigDecimal! @parallel(step: 2)
+  reserve1: BigDecimal! @parallel(step: 2)
 
   # total supply for LP historical returns
-  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
+  totalSupply: BigDecimal! @parallel(step: 2, type: SUM)
 
   # derived liquidity
-  reserveUSD: BigDecimal! @parallel(step: 3)
+  reserveUSD: BigDecimal! @parallel(step: 2)
 
   # volume
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 2, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 2, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal!  @parallel(step: 2, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 2, type: SUM)
 }
 
 # liquidity position
 type LiquidityPosition @entity {
   id: ID!
-  user: User! @parallel(step: 3)
-  pair: Pair! @parallel(step: 3)
-  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
+  user: User! @parallel(step: 2)
+  pair: Pair! @parallel(step: 2)
+  liquidityTokenBalance: BigDecimal! @parallel(step: 2)
   snapshots: [LiquidityPositionSnapshot]! @derivedFrom(field: "liquidityPosition")
-  block: Int! @parallel(step: 3)
-  timestamp: Int! @parallel(step: 3)
+  block: Int! @parallel(step: 2)
+  timestamp: Int! @parallel(step: 2)
 }
 
 # saved over time for return calculations, gets created and never updated
 type LiquidityPositionSnapshot @entity {
   id: ID!
-  liquidityPosition: LiquidityPosition! @parallel(step: 3)
-  timestamp: Int! @parallel(step: 3) # saved for fast historical lookups
-  block: Int! @parallel(step: 3) # saved for fast historical lookups
-  user: User! @parallel(step: 3) # reference to user
-  pair: Pair! @parallel(step: 3) # reference to pair
-  token0PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token0 price
-  token1PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token1 price
-  reserve0: BigDecimal! @parallel(step: 3) # snapshot of pair token0 reserves
-  reserve1: BigDecimal! @parallel(step: 3) # snapshot of pair token1 reserves
-  reserveUSD: BigDecimal! @parallel(step: 3) # snapshot of pair reserves in USD
-  liquidityTokenTotalSupply: BigDecimal! @parallel(step: 3, type: SUM) # snapshot of pool token supply
+  liquidityPosition: LiquidityPosition! @parallel(step: 2)
+  timestamp: Int! @parallel(step: 2) # saved for fast historical lookups
+  block: Int! @parallel(step: 2) # saved for fast historical lookups
+  user: User! @parallel(step: 2) # reference to user
+  pair: Pair! @parallel(step: 2) # reference to pair
+  token0PriceUSD: BigDecimal! @parallel(step: 2) # snapshot of token0 price
+  token1PriceUSD: BigDecimal! @parallel(step: 2) # snapshot of token1 price
+  reserve0: BigDecimal! @parallel(step: 2) # snapshot of pair token0 reserves
+  reserve1: BigDecimal! @parallel(step: 2) # snapshot of pair token1 reserves
+  reserveUSD: BigDecimal! @parallel(step: 2) # snapshot of pair reserves in USD
+  liquidityTokenTotalSupply: BigDecimal! @parallel(step: 2, type: SUM) # snapshot of pool token supply
   # snapshot of users pool token balance
-  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
+  liquidityTokenBalance: BigDecimal! @parallel(step: 2)
 }
 
 # transaction
 type Transaction @entity {
   # transaction hash
   id: ID!
-  blockNumber: BigInt! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3)
+  blockNumber: BigInt! @parallel(step: 2)
+  timestamp: BigInt! @parallel(step: 2)
   # This is not the reverse of Mint.transaction; it is only used to
   # track incomplete mints (similar for burns and swaps)
   mints: [Mint]!
@@ -554,74 +554,74 @@ type Transaction @entity {
 type Mint @entity {
   # transaction hash - index of mint in transaction mints array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 2)
+  timestamp: BigInt! @parallel(step: 2) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 2)
 
   # populated from the primary Transfer event
-  to: String! @parallel(step: 3)
-  liquidity: BigDecimal! @parallel(step: 3)
+  to: String! @parallel(step: 2)
+  liquidity: BigDecimal! @parallel(step: 2)
 
   # populated from the Mint event
-  sender: String @parallel(step: 3)
-  amount0: BigDecimal @parallel(step: 3)
-  amount1: BigDecimal @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String @parallel(step: 2)
+  amount0: BigDecimal @parallel(step: 2)
+  amount1: BigDecimal @parallel(step: 2)
+  logIndex: BigInt @parallel(step: 2)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal @parallel(step: 3)
+  amountUSD: BigDecimal @parallel(step: 2)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: String @parallel(step: 3)
-  feeLiquidity: BigDecimal @parallel(step: 3)
+  feeTo: String @parallel(step: 2)
+  feeLiquidity: BigDecimal @parallel(step: 2)
 }
 
 # burn
 type Burn @entity {
   # transaction hash - index of burn in transaction burns array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 2)
+  timestamp: BigInt! @parallel(step: 2) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 2)
 
   # populated from the primary Transfer event
-  liquidity: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 2)
 
   # populated from the Burn event
-  sender: String @parallel(step: 3)
-  amount0: BigDecimal @parallel(step: 3)
-  amount1: BigDecimal @parallel(step: 3)
-  to: String @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String @parallel(step: 2)
+  amount0: BigDecimal @parallel(step: 2)
+  amount1: BigDecimal @parallel(step: 2)
+  to: String @parallel(step: 2)
+  logIndex: BigInt @parallel(step: 2)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal @parallel(step: 3)
+  amountUSD: BigDecimal @parallel(step: 2)
 
   # mark uncomplete in ETH case
-  complete: Boolean! @parallel(step: 3)
+  complete: Boolean! @parallel(step: 2)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: String @parallel(step: 3)
-  feeLiquidity: BigDecimal @parallel(step: 3)
+  feeTo: String @parallel(step: 2)
+  feeLiquidity: BigDecimal @parallel(step: 2)
 }
 
 # swap
 type Swap @entity {
   # transaction hash - index of swap in transaction swaps array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 2)
+  timestamp: BigInt! @parallel(step: 2) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 2)
 
   # populated from the Swap event
-  sender: String! @parallel(step: 3)
-  amount0In: BigDecimal! @parallel(step: 3)
-  amount1In: BigDecimal! @parallel(step: 3)
-  amount0Out: BigDecimal! @parallel(step: 3)
-  amount1Out: BigDecimal! @parallel(step: 3)
-  to: String! @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String! @parallel(step: 2)
+  amount0In: BigDecimal! @parallel(step: 2)
+  amount1In: BigDecimal! @parallel(step: 2)
+  amount0Out: BigDecimal! @parallel(step: 2)
+  amount1Out: BigDecimal! @parallel(step: 2)
+  to: String! @parallel(step: 2)
+  logIndex: BigInt @parallel(step: 2)
 
   # derived info
-  amountUSD: BigDecimal! @parallel(step: 3)
+  amountUSD: BigDecimal! @parallel(step: 2)
 }
 `,
 	Abis: map[string]string{
@@ -2668,8 +2668,8 @@ func (_ *Bundle) SkipDBLookup() bool {
 	return false
 }
 func (next *Bundle) Merge(step int, cached *Bundle) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.EthPrice = cached.EthPrice
 		}
 	}
@@ -2713,14 +2713,14 @@ func (next *Factory) Merge(step int, cached *Factory) {
 		if next.MutatedOnStep != 1 {
 		}
 	}
-	if step == 4 {
+	if step == 3 {
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
 		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.TokenCount = entity.IntAdd(next.TokenCount, cached.TokenCount)
 		next.UserCount = entity.IntAdd(next.UserCount, cached.UserCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.LiquidityUSD = cached.LiquidityUSD
 			next.LiquidityETH = cached.LiquidityETH
 		}
@@ -2756,12 +2756,12 @@ func (_ *HourData) SkipDBLookup() bool {
 	return false
 }
 func (next *HourData) Merge(step int, cached *HourData) {
-	if step == 4 {
+	if step == 3 {
 		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.UntrackedVolume = entity.FloatAdd(next.UntrackedVolume, cached.UntrackedVolume)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.LiquidityETH = cached.LiquidityETH
 			next.LiquidityUSD = cached.LiquidityUSD
@@ -2798,12 +2798,12 @@ func (_ *DayData) SkipDBLookup() bool {
 	return false
 }
 func (next *DayData) Merge(step int, cached *DayData) {
-	if step == 4 {
+	if step == 3 {
 		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.UntrackedVolume = entity.FloatAdd(next.UntrackedVolume, cached.UntrackedVolume)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.LiquidityETH = cached.LiquidityETH
 			next.LiquidityUSD = cached.LiquidityUSD
@@ -2854,18 +2854,14 @@ func (next *Token) Merge(step int, cached *Token) {
 		}
 	}
 	if step == 3 {
-		if next.MutatedOnStep != 2 {
-			next.DerivedETH = cached.DerivedETH
-		}
-	}
-	if step == 4 {
 		next.TotalSupply = entity.IntAdd(next.TotalSupply, cached.TotalSupply)
 		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.Liquidity = entity.FloatAdd(next.Liquidity, cached.Liquidity)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
+			next.DerivedETH = cached.DerivedETH
 			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
@@ -2904,12 +2900,12 @@ func (_ *TokenHourData) SkipDBLookup() bool {
 	return false
 }
 func (next *TokenHourData) Merge(step int, cached *TokenHourData) {
-	if step == 4 {
+	if step == 3 {
 		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
 		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.Token = cached.Token
 			next.Liquidity = cached.Liquidity
@@ -2953,12 +2949,12 @@ func (_ *TokenDayData) SkipDBLookup() bool {
 	return false
 }
 func (next *TokenDayData) Merge(step int, cached *TokenDayData) {
-	if step == 4 {
+	if step == 3 {
 		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
 		next.VolumeETH = entity.FloatAdd(next.VolumeETH, cached.VolumeETH)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.Token = cached.Token
 			next.Liquidity = cached.Liquidity
@@ -3030,14 +3026,6 @@ func (next *Pair) Merge(step int, cached *Pair) {
 		}
 	}
 	if step == 3 {
-		if next.MutatedOnStep != 2 {
-			next.Reserve0 = cached.Reserve0
-			next.Reserve1 = cached.Reserve1
-			next.Token0Price = cached.Token0Price
-			next.Token1Price = cached.Token1Price
-		}
-	}
-	if step == 4 {
 		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
 		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
 		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
@@ -3045,9 +3033,14 @@ func (next *Pair) Merge(step int, cached *Pair) {
 		next.UntrackedVolumeUSD = entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.LiquidityProviderCount = entity.IntAdd(next.LiquidityProviderCount, cached.LiquidityProviderCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
+			next.Reserve0 = cached.Reserve0
+			next.Reserve1 = cached.Reserve1
 			next.ReserveETH = cached.ReserveETH
 			next.ReserveUSD = cached.ReserveUSD
+			next.TrackedReserveETH = cached.TrackedReserveETH
+			next.Token0Price = cached.Token0Price
+			next.Token1Price = cached.Token1Price
 		}
 	}
 }
@@ -3083,12 +3076,12 @@ func (_ *PairHourData) SkipDBLookup() bool {
 	return false
 }
 func (next *PairHourData) Merge(step int, cached *PairHourData) {
-	if step == 4 {
+	if step == 3 {
 		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
 		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.Pair = cached.Pair
 			next.Reserve0 = cached.Reserve0
@@ -3132,13 +3125,13 @@ func (_ *PairDayData) SkipDBLookup() bool {
 	return false
 }
 func (next *PairDayData) Merge(step int, cached *PairDayData) {
-	if step == 4 {
+	if step == 3 {
 		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
 		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
 		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.Date = cached.Date
 			next.Pair = cached.Pair
 			next.Token0 = cached.Token0
@@ -3171,8 +3164,8 @@ func (_ *LiquidityPosition) SkipDBLookup() bool {
 	return false
 }
 func (next *LiquidityPosition) Merge(step int, cached *LiquidityPosition) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.User = cached.User
 			next.Pair = cached.Pair
 			next.LiquidityTokenBalance = cached.LiquidityTokenBalance
@@ -3216,9 +3209,9 @@ func (_ *LiquidityPositionSnapshot) SkipDBLookup() bool {
 	return false
 }
 func (next *LiquidityPositionSnapshot) Merge(step int, cached *LiquidityPositionSnapshot) {
-	if step == 4 {
+	if step == 3 {
 		next.LiquidityTokenTotalSupply = entity.FloatAdd(next.LiquidityTokenTotalSupply, cached.LiquidityTokenTotalSupply)
-		if next.MutatedOnStep != 3 {
+		if next.MutatedOnStep != 2 {
 			next.LiquidityPosition = cached.LiquidityPosition
 			next.Timestamp = cached.Timestamp
 			next.Block = cached.Block
@@ -3256,8 +3249,8 @@ func (_ *Transaction) SkipDBLookup() bool {
 	return false
 }
 func (next *Transaction) Merge(step int, cached *Transaction) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.BlockNumber = cached.BlockNumber
 			next.Timestamp = cached.Timestamp
 		}
@@ -3293,8 +3286,8 @@ func (_ *Mint) SkipDBLookup() bool {
 	return false
 }
 func (next *Mint) Merge(step int, cached *Mint) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.Transaction = cached.Transaction
 			next.Timestamp = cached.Timestamp
 			next.Pair = cached.Pair
@@ -3341,8 +3334,8 @@ func (_ *Burn) SkipDBLookup() bool {
 	return false
 }
 func (next *Burn) Merge(step int, cached *Burn) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.Transaction = cached.Transaction
 			next.Timestamp = cached.Timestamp
 			next.Pair = cached.Pair
@@ -3392,8 +3385,8 @@ func (_ *Swap) SkipDBLookup() bool {
 	return false
 }
 func (next *Swap) Merge(step int, cached *Swap) {
-	if step == 4 {
-		if next.MutatedOnStep != 3 {
+	if step == 3 {
+		if next.MutatedOnStep != 2 {
 			next.Transaction = cached.Transaction
 			next.Timestamp = cached.Timestamp
 			next.Pair = cached.Pair

@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
-	if s.StepBelow(3) {
+	if s.StepBelow(2) {
 		return nil
 	}
 

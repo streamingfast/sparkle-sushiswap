@@ -6,7 +6,7 @@ import (
 )
 
 func (s *Subgraph) HandlePairBurnEvent(ev *PairBurnEvent) error {
-	if s.StepBelow(3) {
+	if s.StepBelow(2) {
 		return nil
 	}
 

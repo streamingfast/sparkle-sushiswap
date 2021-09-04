@@ -95,7 +95,7 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
-	if s.StepBelow(3) {
+	if s.StepBelow(2) {
 		err = s.Save(pair)
 		if err != nil {
 			return err
