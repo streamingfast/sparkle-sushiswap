@@ -31,11 +31,11 @@ function step2() {
     INFO=.* exchange parallel step -s 2 --input-path ./step1-v1 --output-path ./step2-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
 function step3() {
-    INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 3 --flush-entities --store-snapshot=false --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
 }
-function step4() {
-    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
-}
+#function step4() {
+#    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+#}
 
 
 main() {
@@ -93,28 +93,28 @@ main() {
       done
     fi
 
-    if [ "$1" != "" ] && [ "$1" != 4 ]; then
-      echo "SKIPPING STEP 4"
-    else
-      echo "LAUNCHING STEP 4"
-      rm -rf ./step4-v1
-
-      step4 10794229 10814228
-      step4 10814229 10834228
-      step4 10834229 10854228
-      step4 10854229 10874228
-
-      for job in `jobs -p`; do
-          echo "Waiting on $job"
-          wait $job
-      done
-    fi
+#    if [ "$1" != "" ] && [ "$1" != 4 ]; then
+#      echo "SKIPPING STEP 4"
+#    else
+#      echo "LAUNCHING STEP 4"
+#      rm -rf ./step4-v1
+#
+#      step4 10794229 10814228
+#      step4 10814229 10834228
+#      step4 10834229 10854228
+#      step4 10854229 10874228
+#
+#      for job in `jobs -p`; do
+#          echo "Waiting on $job"
+#          wait $job
+#      done
+#    fi
 
     if [ "$1" != "" ] && [ "$1" != csv ]; then
       echo "SKIPPING STEP CSV"
     else
       echo "Exporting to csv"
-      INFO=.* exchange parallel to-csv --input-path ./step4-v1 --output-path ./stepcsvs --chunk-size 1000
+      INFO=.* exchange parallel to-csv --input-path ./step3-v1 --output-path ./stepcsvs --chunk-size 1000
     fi
   popd &> /dev/null
 }
