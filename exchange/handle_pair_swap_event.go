@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"math/big"
 
 	"github.com/streamingfast/eth-go"
@@ -54,11 +55,24 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 
 	derivedAmountUSD := bf().Mul(derivedAmountETH, bundle.EthPrice.Float())
 
+	s.Log.Debug("calculating getTrackedVolumeUSD",
+		zap.String("pair_name", pair.Name),
+		zap.String("amount_token0_total", amount0Total.Text('g', -1)),
+		zap.String("token0_derived_eth", token0.DerivedETH.Float().Text('g', -1)),
+		zap.String("amount_token1_total", amount1Total.Text('g', -1)),
+		zap.String("token1_derived_eth", token1.DerivedETH.Float().Text('g', -1)),
+	)
+
 	// only accounts for volume through white listed tokens
 	trackedAmountUSD, err := s.getTrackedVolumeUSD(amount0Total, token0, amount1Total, token1, pair)
 	if err != nil {
 		return err
 	}
+
+	s.Log.Debug("tracked_amount_usd",
+		zap.String("pair_name", pair.Name),
+		zap.String("value", trackedAmountUSD.Text('g', -1)),
+	)
 
 	var trackedAmountETH *big.Float
 	if bundle.EthPrice.Float().Cmp(big.NewFloat(0)) == 0 {
@@ -85,6 +99,13 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	token0.TxCount = entity.IntAdd(token0.TxCount, IL(1))
 	token1.TxCount = entity.IntAdd(token1.TxCount, IL(1))
 
+	s.Log.Debug("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value BEFORE", derivedAmountUSD.Text('g', -1)))
+	s.Log.Debug("updating pair values",
+		zap.String("pair", pair.Name),
+		zap.String("VolumeUSD BEFORE", pair.VolumeUSD.Float().Text('g', -1)),
+		zap.String("UntrackedVolumeUSD BEFORE", pair.UntrackedVolumeUSD.Float().Text('g', -1)),
+	)
+
 	// update pair volume data, use tracked amount if we have it as its probably more accurate
 	pair.VolumeUSD = entity.FloatAdd(pair.VolumeUSD, F(trackedAmountUSD))
 	pair.VolumeToken0 = entity.FloatAdd(pair.VolumeToken0, F(amount0Total))
@@ -94,6 +115,12 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	if err := s.Save(pair); err != nil {
 		return fmt.Errorf("saving pair: %w", err)
 	}
+
+	s.Log.Debug("updating pair values",
+		zap.String("pair_name", pair.Name),
+		zap.String("VolumeUSD AFTER", pair.VolumeUSD.Float().Text('g', -1)),
+		zap.String("UntrackedVolumeUSD AFTER", pair.UntrackedVolumeUSD.Float().Text('g', -1)),
+	)
 
 	// update global values, only used tracked amounts for volume
 	if !isBlacklistedAddress(token0.ID) && !isBlacklistedAddress(token1.ID) {
