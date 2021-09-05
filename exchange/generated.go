@@ -298,7 +298,7 @@ type Token @entity {
 
   derivedETH: BigDecimal! @parallel(step: 2)
 
-  whitelistPairs: [Pair!]! @parallel(step: 3)
+  whitelistPairs: [Pair!]! @parallel(step: 1)
 
   # Token hour data
   hourData: [TokenHourData!]! @derivedFrom(field: "token")
@@ -2851,6 +2851,7 @@ func (next *Token) Merge(step int, cached *Token) {
 			next.Symbol = cached.Symbol
 			next.Name = cached.Name
 			next.Decimals = cached.Decimals
+			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
 	if step == 3 {
@@ -2866,7 +2867,6 @@ func (next *Token) Merge(step int, cached *Token) {
 		next.TxCount = entity.IntAdd(next.TxCount, cached.TxCount)
 		next.Liquidity = entity.FloatAdd(next.Liquidity, cached.Liquidity)
 		if next.MutatedOnStep != 3 {
-			next.WhitelistPairs = cached.WhitelistPairs
 		}
 	}
 }

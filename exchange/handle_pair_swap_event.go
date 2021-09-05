@@ -44,6 +44,14 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return err
 	}
 
+	s.Log.Debug("calculating derivedAmountETH",
+		zap.String("pair_name", pair.Name),
+		zap.String("amount_token0_total", amount0Total.Text('g', -1)),
+		zap.String("token0_derived_eth", token0.DerivedETH.Float().Text('g', -1)),
+		zap.String("amount_token1_total", amount1Total.Text('g', -1)),
+		zap.String("token1_derived_eth", token1.DerivedETH.Float().Text('g', -1)),
+	)
+
 	// get total amounts of derived USD and ETH for tracking
 	derivedAmountETH := bf().Quo(
 		bf().Add(
@@ -52,8 +60,10 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		),
 		big.NewFloat(2),
 	)
+	s.Log.Debug("derivedAmountETH", zap.String("pair_name", pair.Name), zap.String("value", derivedAmountETH.Text('g', -1)))
 
 	derivedAmountUSD := bf().Mul(derivedAmountETH, bundle.EthPrice.Float())
+	s.Log.Debug("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value", derivedAmountUSD.Text('g', -1)))
 
 	s.Log.Debug("calculating getTrackedVolumeUSD",
 		zap.String("pair_name", pair.Name),

@@ -229,10 +229,11 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 			return nil, err
 		}
 
-		s.Log.Debug("",
+		s.Log.Debug("eth per token",
+			zap.String("pair_name", pair.Name),
 			zap.Bool("pair exists", pair.Exists()),
-			zap.Stringer("pair_token0_price", pair.Token0Price),
-			zap.Stringer("pair_token1_price", pair.Token1Price),
+			zap.String("pair_token0_price", pair.Token0Price.Float().Text('b', -1)),
+			zap.String("pair_token1_price", pair.Token1Price.Float().Text('b', -1)),
 		)
 
 		if pair.Token0 == tokenAddress && pair.ReserveETH.Float().Cmp(MinimumLiquidityThresholdEth) > 0 {

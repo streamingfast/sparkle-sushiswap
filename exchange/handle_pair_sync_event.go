@@ -117,14 +117,12 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	}
 	s.Log.Debug("updated bundle price", zap.String("pair_name", pair.Name), zap.Reflect("bundle", bundle), zap.Any("prev_eth_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
 
-	s.Log.Debug("calculating t0 derived price", zap.String("token0", token0.ID))
 	t0DerivedETH, err := s.FindEthPerToken(token0)
 	if err != nil {
 		return err
 	}
 	zlog.Debug("calculated derived ETH price for token0", zap.String("pair_name", pair.Name), zap.String("token", token0.Symbol), zap.String("value", t0DerivedETH.Text('g', -1)))
 
-	s.Log.Debug("calculating t1 derived price", zap.String("token1", token1.ID))
 	t1DerivedETH, err := s.FindEthPerToken(token1)
 	if err != nil {
 		return err
@@ -152,13 +150,15 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	// get tracked liquidity - will be 0 if neither is in whitelist
 	trackedLiquidityETH := big.NewFloat(0)
 	if bundle.EthPrice.Float().Cmp(bf()) != 0 {
-		tr, err := s.getTrackedLiquidityUSD(pair.Reserve0.Float(), token0, pair.Reserve1.Float(), token1)
+		trackedLiquidityUSD, err := s.getTrackedLiquidityUSD(pair.Reserve0.Float(), token0, pair.Reserve1.Float(), token1)
 		if err != nil {
 			return err
 		}
+		s.Log.Debug("tracked liquidity usd", zap.String("value", trackedLiquidityUSD.Text('b', -1)))
+
 		trackedLiquidityETH = bf().Quo(
-			tr,
-			ethPrice,
+			trackedLiquidityUSD,
+			bundle.EthPrice.Float(),
 		)
 	}
 
