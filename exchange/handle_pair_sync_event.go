@@ -95,9 +95,6 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return nil
 	}
 
-	// We need to compute the ETH price *before* we save the pair (code just below)
-	// the reason for this, is that we don't want the reserves that are set above to affect
-	// the calculation of the ETH price (this was taken from the typsecript code)
 	ethPrice, err := s.GetEthPriceInUSD()
 	if err != nil {
 		return err
