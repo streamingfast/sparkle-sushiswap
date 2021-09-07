@@ -4,7 +4,10 @@ secrets.go
 /.idea/
 /sparkle
 
+/devel/*/*.txt
+/devel/*.txt
 /localblocks
+/localrpccache
 /step*-v*
 /stepcsvs
 /exported
