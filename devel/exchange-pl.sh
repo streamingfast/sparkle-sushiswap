@@ -4,6 +4,7 @@ set -x;
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 STOREURL=gs://dfuseio-global-blocks-us/eth-mainnet/v5
 RPCENDPOINT="https://bitter-withered-forest.quiknode.pro/750d6d73a803c919af639034b82ef675975cb2ba/"
+RPCCACHE=./localrpccache
 if test -d ../localblocks; then
   echo "Using blocks from local store: ./localblocks"
     STOREURL=./localblocks
@@ -25,16 +26,16 @@ EOC
 fi
 
 function step1() {
-    INFO=.* exchange parallel step -s 1 --output-path ./step1-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 1 --output-path ./step1-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-cache-save-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 function step2() {
-    INFO=.* exchange parallel step -s 2 --input-path ./step1-v1 --output-path ./step2-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 2 --input-path ./step1-v1 --output-path ./step2-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-cache-save-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 function step3() {
-    INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-cache-save-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 function step4() {
-    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=true --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 
 
