@@ -44,7 +44,8 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return err
 	}
 
-	s.Log.Debug("calculating derivedAmountETH",
+	s.Log.Info("calculating derivedAmountETH",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("amount_token0_total", amount0Total.Text('g', -1)),
 		zap.String("token0_derived_eth", token0.DerivedETH.Float().Text('g', -1)),
@@ -60,12 +61,13 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		),
 		big.NewFloat(2),
 	)
-	s.Log.Debug("derivedAmountETH", zap.String("pair_name", pair.Name), zap.String("value", derivedAmountETH.Text('g', -1)))
+	s.Log.Info("derivedAmountETH", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("value", derivedAmountETH.Text('g', -1)))
 
 	derivedAmountUSD := bf().Mul(derivedAmountETH, bundle.EthPrice.Float())
-	s.Log.Debug("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value", derivedAmountUSD.Text('g', -1)))
+	s.Log.Info("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value", derivedAmountUSD.Text('g', -1)))
 
-	s.Log.Debug("calculating getTrackedVolumeUSD",
+	s.Log.Info("calculating getTrackedVolumeUSD",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("amount_token0_total", amount0Total.Text('g', -1)),
 		zap.String("token0_derived_eth", token0.DerivedETH.Float().Text('g', -1)),
@@ -79,7 +81,8 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return err
 	}
 
-	s.Log.Debug("tracked_amount_usd",
+	s.Log.Info("tracked_amount_usd",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("value", trackedAmountUSD.Text('g', -1)),
 	)
@@ -109,8 +112,9 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 	token0.TxCount = entity.IntAdd(token0.TxCount, IL(1))
 	token1.TxCount = entity.IntAdd(token1.TxCount, IL(1))
 
-	s.Log.Debug("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value BEFORE", derivedAmountUSD.Text('g', -1)))
-	s.Log.Debug("updating pair values",
+	s.Log.Info("derivedAmountUSD", zap.String("pair_name", pair.Name), zap.String("value BEFORE", derivedAmountUSD.Text('g', -1)))
+	s.Log.Info("updating pair values",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair", pair.Name),
 		zap.String("VolumeUSD BEFORE", pair.VolumeUSD.Float().Text('g', -1)),
 		zap.String("UntrackedVolumeUSD BEFORE", pair.UntrackedVolumeUSD.Float().Text('g', -1)),
@@ -126,7 +130,8 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		return fmt.Errorf("saving pair: %w", err)
 	}
 
-	s.Log.Debug("updating pair values",
+	s.Log.Info("updating pair values",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("VolumeUSD AFTER", pair.VolumeUSD.Float().Text('g', -1)),
 		zap.String("UntrackedVolumeUSD AFTER", pair.UntrackedVolumeUSD.Float().Text('g', -1)),

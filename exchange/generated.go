@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"math/big"
 	"reflect"
 	"time"
@@ -2846,6 +2847,11 @@ func (_ *Token) SkipDBLookup() bool {
 	return false
 }
 func (next *Token) Merge(step int, cached *Token) {
+	zlog.Info("token_merge",
+		zap.Int("step", step),
+		zap.String("token_next_name", next.Name),
+		zap.String("token_cached_name", cached.Name),
+	)
 	if step == 2 {
 		if next.MutatedOnStep != 1 {
 			next.Symbol = cached.Symbol
@@ -2856,10 +2862,34 @@ func (next *Token) Merge(step int, cached *Token) {
 	}
 	if step == 3 {
 		if next.MutatedOnStep != 2 {
+			zlog.Info("token_merge",
+				zap.Int("step", step),
+				zap.Bool("mutated_on_prev_step", false),
+				zap.String("token_name", next.Name),
+				zap.String("token_derived_eth", cached.DerivedETH.String()),
+			)
 			next.DerivedETH = cached.DerivedETH
+		} else {
+			zlog.Info("token_merge",
+				zap.Int("step", step),
+				zap.Bool("mutated_on_prev_step", true),
+				zap.String("token_name", next.Name),
+				zap.String("token_derived_eth", cached.DerivedETH.String()),
+			)
 		}
 	}
 	if step == 4 {
+		zlog.Info("token_merge",
+			zap.Int("step", step),
+			zap.String("token_name", next.Name),
+			zap.String("volume_usd_cached", cached.VolumeUSD.Float().String()),
+			zap.String("volume_usd_next", cached.VolumeUSD.Float().String()),
+			zap.String("untracked_volume_usd_cached", cached.UntrackedVolumeUSD.String()),
+			zap.String("untracked_volume_usd_next", next.UntrackedVolumeUSD.String()),
+			zap.String("new_untracked_volume_usd", entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD).String()),
+			zap.String("new_volume_usd", entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD).String()),
+		)
+
 		next.TotalSupply = entity.IntAdd(next.TotalSupply, cached.TotalSupply)
 		next.Volume = entity.FloatAdd(next.Volume, cached.Volume)
 		next.VolumeUSD = entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD)
@@ -3020,6 +3050,11 @@ func (_ *Pair) SkipDBLookup() bool {
 	return false
 }
 func (next *Pair) Merge(step int, cached *Pair) {
+	zlog.Info("pair_merge",
+		zap.Int("step", step),
+		zap.String("pair_next_name", next.Name),
+		zap.String("pair_cached_name", cached.Name),
+	)
 	if step == 2 {
 		if next.MutatedOnStep != 1 {
 			next.Name = cached.Name
@@ -3031,13 +3066,44 @@ func (next *Pair) Merge(step int, cached *Pair) {
 	}
 	if step == 3 {
 		if next.MutatedOnStep != 2 {
+			zlog.Info("pair_merge",
+				zap.Int("step", step),
+				zap.Bool("mutated_on_prev_step", true),
+				zap.String("pair_name", next.Name),
+				zap.String("reserve0_cached", cached.Reserve0.String()),
+				zap.String("reserve1_cached", cached.Reserve1.String()),
+				zap.String("token0_price", cached.Token0Price.String()),
+				zap.String("token0_price", cached.Token1Price.String()),
+			)
+
 			next.Reserve0 = cached.Reserve0
 			next.Reserve1 = cached.Reserve1
 			next.Token0Price = cached.Token0Price
 			next.Token1Price = cached.Token1Price
+		} else {
+			zlog.Info("pair_merge",
+				zap.Int("step", step),
+				zap.Bool("mutated_on_prev_step", true),
+				zap.String("pair_name", next.Name),
+				zap.String("reserve0_cached", cached.Reserve0.String()),
+				zap.String("reserve1_cached", cached.Reserve1.String()),
+				zap.String("token0_price", cached.Token0Price.String()),
+				zap.String("token0_price", cached.Token1Price.String()),
+			)
 		}
 	}
 	if step == 4 {
+		zlog.Info("pair_merge",
+			zap.Int("step", step),
+			zap.String("pair_name", next.Name),
+			zap.String("volume_usd_cached", cached.VolumeUSD.Float().String()),
+			zap.String("volume_usd_next", cached.VolumeUSD.Float().String()),
+			zap.String("untracked_volume_usd_cached", cached.UntrackedVolumeUSD.String()),
+			zap.String("untracked_volume_usd_next", next.UntrackedVolumeUSD.String()),
+			zap.String("new_untracked_volume_usd", entity.FloatAdd(next.UntrackedVolumeUSD, cached.UntrackedVolumeUSD).String()),
+			zap.String("new_volume_usd", entity.FloatAdd(next.VolumeUSD, cached.VolumeUSD).String()),
+		)
+
 		next.TotalSupply = entity.FloatAdd(next.TotalSupply, cached.TotalSupply)
 		next.VolumeToken0 = entity.FloatAdd(next.VolumeToken0, cached.VolumeToken0)
 		next.VolumeToken1 = entity.FloatAdd(next.VolumeToken1, cached.VolumeToken1)

@@ -153,7 +153,7 @@ func (s *Subgraph) getTrackedVolumeUSD(tokenAmount0 *big.Float, token0 *Token, t
 
 	price0 := bf().Mul(token0.DerivedETH.Float(), bundle.EthPrice.Float())
 	price1 := bf().Mul(token1.DerivedETH.Float(), bundle.EthPrice.Float())
-	zlog.Debug("bundle", zap.String("pair_name", pair.Name), zap.String("EthPrice", bundle.EthPrice.Float().Text('g', -1)))
+	zlog.Info("bundle", zap.String("pair_name", pair.Name), zap.String("EthPrice", bundle.EthPrice.Float().Text('g', -1)))
 
 	token0Whitelisted := isWhitelistedAddress(token0.ID)
 	token1Whitelisted := isWhitelistedAddress(token1.ID)
@@ -162,28 +162,28 @@ func (s *Subgraph) getTrackedVolumeUSD(tokenAmount0 *big.Float, token0 *Token, t
 	count := pair.LiquidityProviderCount.Int()
 	if count.Cmp(big.NewInt(5)) < 0 {
 		reserve0USD := bf().Mul(pair.Reserve0.Float(), price0)
-		zlog.Debug("reserve 0 usd", zap.String("pair_name", pair.Name), zap.String("pair_reserve_0", pair.Reserve0.Float().Text('g', -1)), zap.String("price 0", price0.Text('g', -1)), zap.String("value", reserve0USD.Text('g', -1)))
+		zlog.Info("reserve 0 usd", zap.String("pair_name", pair.Name), zap.String("pair_reserve_0", pair.Reserve0.Float().Text('g', -1)), zap.String("price 0", price0.Text('g', -1)), zap.String("value", reserve0USD.Text('g', -1)))
 		reserve1USD := bf().Mul(pair.Reserve1.Float(), price1)
-		zlog.Debug("reserve 1 usd", zap.String("pair_name", pair.Name), zap.String("pair_reserve_1", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price1.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
+		zlog.Info("reserve 1 usd", zap.String("pair_name", pair.Name), zap.String("pair_reserve_1", pair.Reserve1.Float().Text('g', -1)), zap.String("price 1", price1.Text('g', -1)), zap.String("value", reserve1USD.Text('g', -1)))
 
 		if token0Whitelisted && token1Whitelisted {
 			totalReserve := bf().Add(reserve0USD, reserve1USD)
-			zlog.Debug("total pair reserve", zap.String("pair_name", pair.Name), zap.String("value", totalReserve.Text('g', -1)))
+			zlog.Info("total pair reserve", zap.String("pair_name", pair.Name), zap.String("value", totalReserve.Text('g', -1)))
 
 			if totalReserve.Cmp(MinimumUSDThresholdNewPairs) < 0 {
-				zlog.Debug("under minimum threshold. returning 0", zap.String("pair_name", pair.Name),)
+				zlog.Info("under minimum threshold. returning 0", zap.String("pair_name", pair.Name))
 				return big.NewFloat(0), nil
 			}
 		}
 		if token0Whitelisted && !token1Whitelisted {
 			if bf().Mul(reserve0USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
-				zlog.Debug("under minimum threshold. returning 0", zap.String("pair_name", pair.Name),)
+				zlog.Debug("under minimum threshold. returning 0", zap.String("pair_name", pair.Name))
 				return big.NewFloat(0), nil
 			}
 		}
 		if !token0Whitelisted && token1Whitelisted {
 			if bf().Mul(reserve1USD, big.NewFloat(2)).Cmp(MinimumUSDThresholdNewPairs) < 0 {
-				zlog.Debug("under minimum threshold. returning 0", zap.String("pair_name", pair.Name),)
+				zlog.Debug("under minimum threshold. returning 0", zap.String("pair_name", pair.Name))
 				return big.NewFloat(0), nil
 			}
 		}

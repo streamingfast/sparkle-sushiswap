@@ -58,11 +58,13 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	pair.Reserve1 = F(entity.ConvertTokenToDecimal(ev.Reserve1, token1.Decimals.Int().Int64()))
 
 	zlog.Debug("updated pair 0 reserve",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("from", pairReserve0Before.Float().Text('g', -1)),
 		zap.String("to", pair.Reserve0.Float().Text('g', -1)),
 	)
 	zlog.Debug("updated pair 1 reserve",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("from", pairReserve1Before.Float().Text('g', -1)),
 		zap.String("to", pair.Reserve1.Float().Text('g', -1)),
@@ -74,19 +76,23 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	} else {
 		pair.Token0Price = FL(0)
 	}
-	zlog.Debug("pair token0 price after", zap.String("pair_name", pair.Name), zap.String("value", pair.Token0Price.Float().Text('g', -1)))
+	zlog.Debug("pair token0 price after", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("value", pair.Token0Price.Float().Text('g', -1)))
 
-	zlog.Debug("pair token1 price before",zap.String("pair_name", pair.Name),  zap.String("value", pair.Token1Price.Float().Text('g', -1)))
+	zlog.Debug("pair token1 price before", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("value", pair.Token1Price.Float().Text('g', -1)))
 	if pair.Reserve0.Float().Cmp(bf()) != 0 {
 		pair.Token1Price = F(bf().Quo(pair.Reserve1.Float(), pair.Reserve0.Float()))
 	} else {
 		pair.Token1Price = FL(0)
 	}
-	zlog.Debug("pair token1 price after", zap.String("pair_name", pair.Name), zap.String("value", pair.Token1Price.Float().Text('g', -1)))
+	zlog.Debug("pair token1 price after", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("value", pair.Token1Price.Float().Text('g', -1)))
 
 	err = s.Save(pair)
 	if err != nil {
 		return err
+	}
+
+	if s.StepBelow(3) {
+		return nil
 	}
 
 	// We need to compute the ETH price *before* we save the pair (code just below)
@@ -95,14 +101,6 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	ethPrice, err := s.GetEthPriceInUSD()
 	if err != nil {
 		return err
-	}
-
-	if s.StepBelow(3) {
-		err = s.Save(pair)
-		if err != nil {
-			return err
-		}
-		return nil
 	}
 
 	bundle, err := s.getBundle() // creates bundle if it does not exist
@@ -115,19 +113,19 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	if err := s.Save(bundle); err != nil {
 		return err
 	}
-	s.Log.Debug("updated bundle price", zap.String("pair_name", pair.Name), zap.Reflect("bundle", bundle), zap.Any("prev_eth_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
+	s.Log.Info("updated bundle price", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.Reflect("bundle", bundle), zap.Any("prev_eth_price", prevEthPrice), zap.Uint64("block_number", ev.Block.Number), zap.Stringer("transaction_id", ev.Transaction.Hash))
 
 	t0DerivedETH, err := s.FindEthPerToken(token0)
 	if err != nil {
 		return err
 	}
-	zlog.Debug("calculated derived ETH price for token0", zap.String("pair_name", pair.Name), zap.String("token", token0.Symbol), zap.String("value", t0DerivedETH.Text('g', -1)))
+	zlog.Info("calculated derived ETH price for token0", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("token", token0.Symbol), zap.String("value", t0DerivedETH.Text('g', -1)))
 
 	t1DerivedETH, err := s.FindEthPerToken(token1)
 	if err != nil {
 		return err
 	}
-	zlog.Debug("calculated derived ETH price for token1", zap.String("pair_name", pair.Name), zap.String("token", token1.Symbol), zap.String("value", t1DerivedETH.Text('g', -1)))
+	zlog.Info("calculated derived ETH price for token1", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()), zap.String("pair_name", pair.Name), zap.String("token", token1.Symbol), zap.String("value", t1DerivedETH.Text('g', -1)))
 
 	token0.DerivedETH = F(t0DerivedETH)
 	token1.DerivedETH = F(t1DerivedETH)
@@ -140,7 +138,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		return err
 	}
 
-	s.Log.Debug("new token prices",
+	s.Log.Info("new token prices",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("token0", token0.Symbol),
 		zap.String("token0_value", token0.DerivedETH.Float().Text('g', -1)),
 		zap.String("token1", token1.Symbol),
@@ -154,7 +153,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		if err != nil {
 			return err
 		}
-		s.Log.Debug("tracked liquidity usd", zap.String("value", trackedLiquidityUSD.Text('b', -1)))
+		s.Log.Info("tracked liquidity usd", zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
+			zap.String("pair_name", pair.Name), zap.String("value", trackedLiquidityUSD.Text('b', -1)))
 
 		trackedLiquidityETH = bf().Quo(
 			trackedLiquidityUSD,
@@ -162,7 +162,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 		)
 	}
 
-	s.Log.Debug("new tracked liquidity eth in the pair",
+	s.Log.Info("new tracked liquidity eth in the pair",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("value", trackedLiquidityETH.Text('g', -1)),
 	)
@@ -170,7 +171,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 	// use derived amounts within pair
 	pair.TrackedReserveETH = F(trackedLiquidityETH)
 
-	s.Log.Debug("calculating pair reserve eth",
+	s.Log.Info("calculating pair reserve eth",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("pair.reserve0", pair.Reserve0.Float().Text('b', -1)),
 		zap.String("token0.derviedEth", t0DerivedETH.Text('b', -1)),
@@ -191,7 +193,8 @@ func (s *Subgraph) HandlePairSyncEvent(ev *PairSyncEvent) error {
 
 	pair.ReserveETH = reserveEth
 
-	s.Log.Debug("calculating pair reserve usd",
+	s.Log.Info("calculating pair reserve usd",
+		zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 		zap.String("pair_name", pair.Name),
 		zap.String("pair.reserve1", pair.ReserveETH.Float().Text('b', -1)),
 		zap.String("bundle.EthPrice", bundle.EthPrice.Float().Text('b', -1)),
