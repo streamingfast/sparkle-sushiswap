@@ -35,7 +35,10 @@ function step3() {
     INFO=.* exchange parallel step -s 3 --input-path ./step2-v1 --output-path ./step3-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-cache-save-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 function step4() {
-    INFO=.* exchange parallel step -s 4 --flush-entities --store-snapshot=true --store-snapshot=false --input-path ./step3-v1 --output-path ./step4-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
+    INFO=.* exchange parallel step -s 4 --input-path ./step3-v1 --output-path ./step4-v1 --start-block $1 --stop-block $2 --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-cache-save-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
+}
+function step5() {
+    INFO=.* exchange parallel step -s 5 --flush-entities --store-snapshot=false --input-path ./step4-v1 --output-path ./step5-v1  --start-block $1 --stop-block $2  --blocks-store-url $STOREURL --rpc-cache-load-path $RPCCACHE --rpc-endpoint $RPCENDPOINT &
 }
 
 
@@ -104,6 +107,23 @@ main() {
       step4 10814229 10834228
       step4 10834229 10854228
       step4 10854229 10854230
+
+      for job in `jobs -p`; do
+          echo "Waiting on $job"
+          wait $job
+      done
+    fi
+
+    if [ "$1" != "" ] && [ "$1" != 5 ]; then
+      echo "SKIPPING STEP 5"
+    else
+      echo "LAUNCHING STEP 5"
+      rm -rf ./step5-v1
+
+      step5 10794229 10814228
+      step5 10814229 10834228
+      step5 10834229 10854228
+      step5 10854229 10854230
 
       for job in `jobs -p`; do
           echo "Waiting on $job"

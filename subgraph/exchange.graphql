@@ -31,7 +31,7 @@ type Bundle @entity {
   id: ID!
 
   # price of ETH usd
-  ethPrice: BigDecimal! @parallel(step: 3)
+  ethPrice: BigDecimal! @parallel(step: 4)
 }
 
 # Factory
@@ -43,28 +43,28 @@ type Factory @entity {
   pairCount: BigInt! @parallel(step: 1, type: SUM)
 
   # Volume USD
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
 
   # Volume ETH
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 4, type: SUM)
 
   # Untracked volume
-  untrackedVolumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  untrackedVolumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
 
   # Liquidity USD
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityUSD: BigDecimal! @parallel(step: 4)
 
   # Liquidity ETH
-  liquidityETH: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 4)
 
   # Transaction count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 
   # Token count
-  tokenCount: BigInt! @parallel(step: 3, type: SUM)
+  tokenCount: BigInt! @parallel(step: 4, type: SUM)
 
   # User count
-  userCount: BigInt! @parallel(step: 3, type: SUM)
+  userCount: BigInt! @parallel(step: 4, type: SUM)
 
   # Pairs
   pairs: [Pair!]! @derivedFrom(field: "factory")
@@ -85,22 +85,22 @@ type HourData @entity {
   id: ID!
 
   # date
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
-  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 4, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 4)
+  liquidityUSD: BigDecimal! @parallel(step: 4)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 }
 
 # Day Data
@@ -109,22 +109,22 @@ type DayData @entity {
   id: ID!
 
   # date
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # factory
   factory: Factory!
 
   # volume
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
-  untrackedVolume: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
+  untrackedVolume: BigDecimal! @parallel(step: 4, type: SUM)
 
   # liquidity
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidityETH: BigDecimal! @parallel(step: 4)
+  liquidityUSD: BigDecimal! @parallel(step: 4)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 }
 
 # Token
@@ -141,20 +141,20 @@ type Token @entity {
   decimals: BigInt! @parallel(step: 1)
 
   # used for other stats like marketcap
-  totalSupply: BigInt!  @parallel(step: 3, type: SUM)
+  totalSupply: BigInt!  @parallel(step: 4, type: SUM)
 
   # token specific volume
-  volume: BigDecimal!  @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
-  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
+  volume: BigDecimal!  @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 4, type: SUM)
 
   # transactions across all pairs
-  txCount: BigInt!  @parallel(step: 3, type: SUM)
+  txCount: BigInt!  @parallel(step: 4, type: SUM)
 
   # liquidity across all pairs
-  liquidity: BigDecimal!  @parallel(step: 3, type: SUM)
+  liquidity: BigDecimal!  @parallel(step: 4, type: SUM)
 
-  derivedETH: BigDecimal! @parallel(step: 2)
+  derivedETH: BigDecimal! @parallel(step: 4)
 
   whitelistPairs: [Pair!]! @parallel(step: 1)
 
@@ -183,26 +183,26 @@ type TokenHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # token
-  token: Token! @parallel(step: 3)
+  token: Token! @parallel(step: 4)
 
   # volume
-  volume: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volume: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal! @parallel(step: 3)
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 4)
+  liquidityETH: BigDecimal! @parallel(step: 4)
+  liquidityUSD: BigDecimal! @parallel(step: 4)
 
   # price usd
-  priceUSD: BigDecimal! @parallel(step: 3)
+  priceUSD: BigDecimal! @parallel(step: 4)
 }
 
 # Token day data
@@ -211,26 +211,26 @@ type TokenDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # token
-  token: Token! @parallel(step: 3)
+  token: Token! @parallel(step: 4)
 
   # volume
-  volume: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeETH: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volume: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeETH: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 
   # liquidity
-  liquidity: BigDecimal! @parallel(step: 3)
-  liquidityETH: BigDecimal! @parallel(step: 3)
-  liquidityUSD: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 4)
+  liquidityETH: BigDecimal! @parallel(step: 4)
+  liquidityUSD: BigDecimal! @parallel(step: 4)
 
   # price usd
-  priceUSD: BigDecimal! @parallel(step: 3)
+  priceUSD: BigDecimal! @parallel(step: 4)
 }
 
 # Pair
@@ -250,7 +250,7 @@ type Pair @entity {
 
   reserve0: BigDecimal! @parallel(step: 2)
   reserve1: BigDecimal! @parallel(step: 2)
-  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
+  totalSupply: BigDecimal! @parallel(step: 4, type: SUM)
 
   # derived liquidity
   reserveETH: BigDecimal! @parallel(step: 3)
@@ -264,15 +264,15 @@ type Pair @entity {
   token1Price: BigDecimal! @parallel(step: 2)
 
   # lifetime volume stats
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM) @sql(index: false)
-  untrackedVolumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
-  txCount: BigInt!  @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM) @sql(index: false)
+  untrackedVolumeUSD: BigDecimal!  @parallel(step: 4, type: SUM)
+  txCount: BigInt!  @parallel(step: 4, type: SUM)
 
   # Fields used to help derived relationship
   # used to detect new exchanges
-  liquidityProviderCount: BigInt! @parallel(step: 3, type: SUM)
+  liquidityProviderCount: BigInt! @parallel(step: 4, type: SUM)
 
   # lca: BigDecimal!
   # lcad: BigDecimal!
@@ -305,27 +305,27 @@ type PairHourData @entity {
   id: ID!
 
   # date - hour start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # pair
-  pair: Pair! @parallel(step: 3)
+  pair: Pair! @parallel(step: 4)
 
   # reserves
-  reserve0: BigDecimal! @parallel(step: 3)
-  reserve1: BigDecimal! @parallel(step: 3)
+  reserve0: BigDecimal! @parallel(step: 4)
+  reserve1: BigDecimal! @parallel(step: 4)
 
   # derived liquidity
   reserveUSD: BigDecimal!
 
   # volume
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 4, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal! @parallel(step: 4, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 }
 
 # Pair day data
@@ -334,73 +334,73 @@ type PairDayData @entity {
   id: ID!
 
   # date - day start timestamp
-  date: Int! @parallel(step: 3)
+  date: Int! @parallel(step: 4)
 
   # pair
-  pair: Pair! @parallel(step: 3)
+  pair: Pair! @parallel(step: 4)
 
   # token0
-  token0: Token! @parallel(step: 3)
+  token0: Token! @parallel(step: 4)
 
   # token1
-  token1: Token! @parallel(step: 3)
+  token1: Token! @parallel(step: 4)
 
   # reserves
-  reserve0: BigDecimal! @parallel(step: 3)
-  reserve1: BigDecimal! @parallel(step: 3)
+  reserve0: BigDecimal! @parallel(step: 4)
+  reserve1: BigDecimal! @parallel(step: 4)
 
   # total supply for LP historical returns
-  totalSupply: BigDecimal! @parallel(step: 3, type: SUM)
+  totalSupply: BigDecimal! @parallel(step: 4, type: SUM)
 
   # derived liquidity
-  reserveUSD: BigDecimal! @parallel(step: 3)
+  reserveUSD: BigDecimal! @parallel(step: 4)
 
   # volume
-  volumeToken0: BigDecimal! @parallel(step: 3, type: SUM)
-  volumeToken1: BigDecimal! @parallel(step: 3, type: SUM)
+  volumeToken0: BigDecimal! @parallel(step: 4, type: SUM)
+  volumeToken1: BigDecimal! @parallel(step: 4, type: SUM)
 
   # volume usd
-  volumeUSD: BigDecimal!  @parallel(step: 3, type: SUM)
+  volumeUSD: BigDecimal!  @parallel(step: 4, type: SUM)
 
   # tx count
-  txCount: BigInt! @parallel(step: 3, type: SUM)
+  txCount: BigInt! @parallel(step: 4, type: SUM)
 }
 
 # liquidity position
 type LiquidityPosition @entity {
   id: ID!
-  user: User! @parallel(step: 3)
-  pair: Pair! @parallel(step: 3)
-  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
+  user: User! @parallel(step: 4)
+  pair: Pair! @parallel(step: 4)
+  liquidityTokenBalance: BigDecimal! @parallel(step: 4)
   snapshots: [LiquidityPositionSnapshot]! @derivedFrom(field: "liquidityPosition")
-  block: Int! @parallel(step: 3)
-  timestamp: Int! @parallel(step: 3)
+  block: Int! @parallel(step: 4)
+  timestamp: Int! @parallel(step: 4)
 }
 
 # saved over time for return calculations, gets created and never updated
 type LiquidityPositionSnapshot @entity {
   id: ID!
-  liquidityPosition: LiquidityPosition! @parallel(step: 3)
-  timestamp: Int! @parallel(step: 3) # saved for fast historical lookups
-  block: Int! @parallel(step: 3) # saved for fast historical lookups
-  user: User! @parallel(step: 3) # reference to user
-  pair: Pair! @parallel(step: 3) # reference to pair
-  token0PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token0 price
-  token1PriceUSD: BigDecimal! @parallel(step: 3) # snapshot of token1 price
-  reserve0: BigDecimal! @parallel(step: 3) # snapshot of pair token0 reserves
-  reserve1: BigDecimal! @parallel(step: 3) # snapshot of pair token1 reserves
-  reserveUSD: BigDecimal! @parallel(step: 3) # snapshot of pair reserves in USD
-  liquidityTokenTotalSupply: BigDecimal! @parallel(step: 3, type: SUM) # snapshot of pool token supply
+  liquidityPosition: LiquidityPosition! @parallel(step: 4)
+  timestamp: Int! @parallel(step: 4) # saved for fast historical lookups
+  block: Int! @parallel(step: 4) # saved for fast historical lookups
+  user: User! @parallel(step: 4) # reference to user
+  pair: Pair! @parallel(step: 4) # reference to pair
+  token0PriceUSD: BigDecimal! @parallel(step: 4) # snapshot of token0 price
+  token1PriceUSD: BigDecimal! @parallel(step: 4) # snapshot of token1 price
+  reserve0: BigDecimal! @parallel(step: 4) # snapshot of pair token0 reserves
+  reserve1: BigDecimal! @parallel(step: 4) # snapshot of pair token1 reserves
+  reserveUSD: BigDecimal! @parallel(step: 4) # snapshot of pair reserves in USD
+  liquidityTokenTotalSupply: BigDecimal! @parallel(step: 4, type: SUM) # snapshot of pool token supply
   # snapshot of users pool token balance
-  liquidityTokenBalance: BigDecimal! @parallel(step: 3)
+  liquidityTokenBalance: BigDecimal! @parallel(step: 4)
 }
 
 # transaction
 type Transaction @entity {
   # transaction hash
   id: ID!
-  blockNumber: BigInt! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3)
+  blockNumber: BigInt! @parallel(step: 4)
+  timestamp: BigInt! @parallel(step: 4)
   # This is not the reverse of Mint.transaction; it is only used to
   # track incomplete mints (similar for burns and swaps)
   mints: [Mint]!
@@ -412,72 +412,72 @@ type Transaction @entity {
 type Mint @entity {
   # transaction hash - index of mint in transaction mints array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 4)
+  timestamp: BigInt! @parallel(step: 4) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 4)
 
   # populated from the primary Transfer event
-  to: String! @parallel(step: 3)
-  liquidity: BigDecimal! @parallel(step: 3)
+  to: String! @parallel(step: 4)
+  liquidity: BigDecimal! @parallel(step: 4)
 
   # populated from the Mint event
-  sender: String @parallel(step: 3)
-  amount0: BigDecimal @parallel(step: 3)
-  amount1: BigDecimal @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String @parallel(step: 4)
+  amount0: BigDecimal @parallel(step: 4)
+  amount1: BigDecimal @parallel(step: 4)
+  logIndex: BigInt @parallel(step: 4)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal @parallel(step: 3)
+  amountUSD: BigDecimal @parallel(step: 4)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: String @parallel(step: 3)
-  feeLiquidity: BigDecimal @parallel(step: 3)
+  feeTo: String @parallel(step: 4)
+  feeLiquidity: BigDecimal @parallel(step: 4)
 }
 
 # burn
 type Burn @entity {
   # transaction hash - index of burn in transaction burns array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 4)
+  timestamp: BigInt! @parallel(step: 4) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 4)
 
   # populated from the primary Transfer event
-  liquidity: BigDecimal! @parallel(step: 3)
+  liquidity: BigDecimal! @parallel(step: 4)
 
   # populated from the Burn event
-  sender: String @parallel(step: 3)
-  amount0: BigDecimal @parallel(step: 3)
-  amount1: BigDecimal @parallel(step: 3)
-  to: String @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String @parallel(step: 4)
+  amount0: BigDecimal @parallel(step: 4)
+  amount1: BigDecimal @parallel(step: 4)
+  to: String @parallel(step: 4)
+  logIndex: BigInt @parallel(step: 4)
   # derived amount based on available prices of tokens
-  amountUSD: BigDecimal @parallel(step: 3)
+  amountUSD: BigDecimal @parallel(step: 4)
 
   # mark uncomplete in ETH case
-  complete: Boolean! @parallel(step: 3)
+  complete: Boolean! @parallel(step: 4)
 
   # optional fee fields, if a Transfer event is fired in _mintFee
-  feeTo: String @parallel(step: 3)
-  feeLiquidity: BigDecimal @parallel(step: 3)
+  feeTo: String @parallel(step: 4)
+  feeLiquidity: BigDecimal @parallel(step: 4)
 }
 
 # swap
 type Swap @entity {
   # transaction hash - index of swap in transaction swaps array
   id: ID!
-  transaction: Transaction! @parallel(step: 3)
-  timestamp: BigInt! @parallel(step: 3) # need this to pull recent txns for specific token or pair
-  pair: Pair! @parallel(step: 3)
+  transaction: Transaction! @parallel(step: 4)
+  timestamp: BigInt! @parallel(step: 4) # need this to pull recent txns for specific token or pair
+  pair: Pair! @parallel(step: 4)
 
   # populated from the Swap event
-  sender: String! @parallel(step: 3)
-  amount0In: BigDecimal! @parallel(step: 3)
-  amount1In: BigDecimal! @parallel(step: 3)
-  amount0Out: BigDecimal! @parallel(step: 3)
-  amount1Out: BigDecimal! @parallel(step: 3)
-  to: String! @parallel(step: 3)
-  logIndex: BigInt @parallel(step: 3)
+  sender: String! @parallel(step: 4)
+  amount0In: BigDecimal! @parallel(step: 4)
+  amount1In: BigDecimal! @parallel(step: 4)
+  amount0Out: BigDecimal! @parallel(step: 4)
+  amount1Out: BigDecimal! @parallel(step: 4)
+  to: String! @parallel(step: 4)
+  logIndex: BigInt @parallel(step: 4)
 
   # derived info
-  amountUSD: BigDecimal! @parallel(step: 3)
+  amountUSD: BigDecimal! @parallel(step: 4)
 }
