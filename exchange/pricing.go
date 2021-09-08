@@ -229,7 +229,7 @@ func (s *Subgraph) FindEthPerToken(token *Token) (*big.Float, error) {
 			return nil, err
 		}
 
-		s.Log.Info("eth per token",
+		s.Log.Debug("eth per token",
 			zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
 			zap.String("pair_name", pair.Name),
 			zap.Bool("pair exists", pair.Exists()),
