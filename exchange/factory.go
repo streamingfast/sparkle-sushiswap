@@ -9,6 +9,12 @@ func (s *Subgraph) getFactory() (*Factory, error) {
 		return nil, err
 	}
 
+	if !factory.Exists() {
+		if err := s.Save(factory); err != nil {
+			return nil, err
+		}
+	}
+
 	return factory, nil
 }
 
