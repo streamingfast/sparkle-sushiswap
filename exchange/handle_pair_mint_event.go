@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Subgraph) HandlePairMintEvent(ev *PairMintEvent) error {
-	if s.StepBelow(3) {
+	if s.StepBelow(4) {
 		return nil
 	}
 

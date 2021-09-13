@@ -135,7 +135,7 @@ main() {
       echo "SKIPPING STEP CSV"
     else
       echo "Exporting to csv"
-      INFO=.* exchange parallel to-csv --input-path ./step4-v1 --output-path ./stepcsvs --chunk-size 1000
+      INFO=.* exchange parallel to-csv --input-path ./step5-v1 --output-path ./stepcsvs --chunk-size 1000
     fi
   popd &> /dev/null
 }

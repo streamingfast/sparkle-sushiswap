@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
-	if s.StepBelow(3) {
+	if s.StepBelow(4) {
 		return nil
 	}
 
@@ -124,10 +124,20 @@ func (s *Subgraph) HandlePairTransferEvent(ev *PairTransferEvent) error {
 
 	// burn
 	if ev.To.Pretty() == ZeroAddress && ev.From.Pretty() == pair.ID {
+		s.Log.Info("transfer burn updating pair values",
+			zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
+			zap.String("pair", pair.Name),
+			zap.String("TotalSupply BEFORE", pair.TotalSupply.Float().Text('g', -1)),
+		)
 		pair.TotalSupply = F(bf().Sub(pair.TotalSupply.Float(), value))
 		if err := s.Save(pair); err != nil {
 			return err
 		}
+		s.Log.Info("transfer burn updating pair values",
+			zap.Int("step", s.Step()), zap.Uint64("block", s.Block().Number()),
+			zap.String("pair", pair.Name),
+			zap.String("TotalSupply After", pair.TotalSupply.Float().Text('g', -1)),
+		)
 
 		var burn *Burn
 		if len(trx.Burns) > 0 {

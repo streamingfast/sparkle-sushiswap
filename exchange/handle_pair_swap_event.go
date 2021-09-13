@@ -118,6 +118,8 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		zap.String("pair", pair.Name),
 		zap.String("VolumeUSD BEFORE", pair.VolumeUSD.Float().Text('g', -1)),
 		zap.String("UntrackedVolumeUSD BEFORE", pair.UntrackedVolumeUSD.Float().Text('g', -1)),
+		zap.String("TxCount BEFORE", pair.TxCount.Int().Text(10)),
+		zap.String("TotalSupply BEFORE", pair.TotalSupply.Float().Text('g', -1)),
 	)
 
 	// update pair volume data, use tracked amount if we have it as its probably more accurate
@@ -135,6 +137,8 @@ func (s *Subgraph) HandlePairSwapEvent(ev *PairSwapEvent) error {
 		zap.String("pair_name", pair.Name),
 		zap.String("VolumeUSD AFTER", pair.VolumeUSD.Float().Text('g', -1)),
 		zap.String("UntrackedVolumeUSD AFTER", pair.UntrackedVolumeUSD.Float().Text('g', -1)),
+		zap.String("TxCount AFTER", pair.TxCount.Int().Text(10)),
+		zap.String("TotalSupply AFTER", pair.TotalSupply.Float().Text('g', -1)),
 	)
 
 	// update global values, only used tracked amounts for volume
